@@ -2,18 +2,26 @@
 <app-layout title="s">
   <!-- <div class="container"> -->
     <h1 class="text-center">Laravel Video Chat</h1>
-    <div class="grid grid-flow-col grid-cols-3 grid-rows-2 gap-4">
-      <div v-for="user in users" :key="user.id">
-          <p>{{user.name}}</p>
-        <video v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
-        <video v-else  :ref="user.name" autoplay poster='/noimage.jpg' :alt="user.name"></video>
-      </div>
-      <div>
-          <p>my video</p>
-      <video v-if="stream" ref="video-here" autoplay></video>
-      <img v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name">
-          </div>
+    <div class="w-full flex flex-rows bg-gray-800">
+      <div  :class="userCheck?'w-3/4 bg-blue-500 grid  grid-cols-2 gap-4':'w-3/4 bg-red-500'" ref="main">
+            <div class="flex" v-for="user in users" :key="user.id">
+                <p>{{user.name}}</p>
+              <video class="m-auto h-56" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
+              <video  class="m-auto h-56 " v-else  :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
+            </div>
+            <div  class="flex">
+                <!-- <p>my video</p> -->
+                <video :class="userCheck?'m-auto max-w-56 h-56':'m-auto rounded-full h-96'" v-if="stream" ref="video-here" autoplay></video>
+                <img :class="userCheck?`m-auto rounded-full object-cover h-64`:'m-auto rounded-full h-96'" v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/>
+            </div>
+       </div>
+
+       <div class="w-1/4 bg-red-400">
+          <message-container :messages="messages" @messageSend="messageSend"/>
+       </div>
     </div>
+   
+    
 
     <!-- <div v-for="user in users" :key="user.id">
         <h1 :ref="user.name">{{user.name}}</h1>
@@ -23,11 +31,10 @@
 </app-layout>
 </template>
 <script>
-import Pusher from 'pusher-js';
 import Peer from 'simple-peer';
-import { Inertia } from '@inertiajs/inertia'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import axios from 'axios'
+import MessageContainer from './MessageContainer.vue';
 export default {
   props: ['user','roomId'],
   data() {
@@ -35,12 +42,13 @@ export default {
       channel: null,
       stream: null,
       peers: {},
-      users:[]
-      // pusherKey:null
+      users:[],
+      messages:[]
     }
   },
    components:{
       AppLayout,
+      MessageContainer,
     },
 
   beforeUnmount(){
@@ -50,12 +58,33 @@ export default {
   },
   mounted() {
     this.setupVideoChat()
-    console.log(this.$page.pro)
+    // console.log(this.$page.pro)
 
   },
+  computed:{
+    userCheck(){
+      if(this.users.length){
+        return true
+      }else{
+        return false
+      }
+    }
+  },
   methods: {
+    messageSend(content){
+        this.channel.whisper('client-message-'+this.roomId, {
+              userId: this.user.id,
+              userName:this.user.name,
+              data:content
+           });
+        this.messages.push({  
+             userId: this.user.id,
+              userName:this.user.name,
+              data:content})
+    },
     start(){
-      console.log(this.$refs)
+      console.log(this.users)
+      console.log(this.$refs.main.class)
     },
     RoomOut(){
    if(this.stream){
@@ -91,12 +120,8 @@ export default {
 
         })
         .on('stream', (stream) => {
-            //아마 이새끼 스트림을 못받아서 그런거 같아
           const videoThere = this.$refs[userName];
-          // console.log(this.$refs[`${userName}`])
-          // console.log(userName)
           videoThere.srcObject = stream;
-          // console.log('hoho')
         })
         .on('close', () => {
           const peer = this.peers[userId];
@@ -110,14 +135,6 @@ export default {
       return this.peers[userId];
     },
     async setupVideoChat() {
-      // To show pusher errors
-      // Pusher.logToConsole = true;
-//       navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-     
-    //  const stream = await navigator.mediaDevices.getUserMedia({audio: true });
-    //   const videoHere = this.$refs['video-here'];
-    //   videoHere.srcObject = stream;
-    //   this.stream = stream;
       try{
         const stream = await navigator.mediaDevices.getUserMedia({audio: true });
       const videoHere = this.$refs['video-here'];
@@ -127,11 +144,6 @@ export default {
        this.stream = null;
       }
      
-     //  console.log(this.stream)
-      // const pusher = this.getPusherInstance();
-      //  console.log('channel')
-
-      //여기서 부터
       console.log(this.roomId)
        this.channel=window.Echo.join('presence-video-chat.'+this.roomId)
         .here((users) => {
@@ -157,36 +169,13 @@ export default {
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
           const peer = this.getPeer(signal.userId,signal.userName ,false);
           peer.signal(signal.data);
-           });
-
-        // this.channel = pusher.subscribe('presence-video-chat-'+this.roomId);
-        // console.log(this.channel)
-        // this.channel.bind(`client-signal-${this.user.id}`, (signal) =>
-        // {
-        //   const peer = this.getPeer(signal.userId, false);
-        //   peer.signal(signal.data);
-        //   console.log('signal')
-        // });
-        // this.channel.bind('managerOut',(signal)=>{
-        //   console.log('managerout')
-        // })
-
+           })
+      .listenForWhisper('client-message-'+this.roomId,(message)=>{
+                     console.log(message)
+                     this.messages.push(message)
+              });
     },
-    // getPusherInstance() {
-    //   //이거 멤버변수로 해놓으면 못받는듯
-    //   console.log('09b388928591241646f6')
-    //   return new Pusher(this.pusherKey, {
-    //     authEndpoint: '/auth/video_chat',
-    //     cluster: this.pusherCluster,
-    //     auth: {
-    //       headers: {
-    //         //이거 블레이드 없어서 뷰에서 따로 보내줘야됨
-    //         //그래서 일단 app블레이드 헤드 에다가 추가해놈
-    //         'X-CSRF-Token': document.head.querySelector('meta[name="csrf-token"]').content
-    //    }
-    //     }
-    //   });
-    // }
+    
   }
 };
 </script>
