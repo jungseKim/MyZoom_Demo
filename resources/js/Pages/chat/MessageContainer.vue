@@ -1,6 +1,6 @@
 <template>
         <div>
-        <div class="h-36 overflow-y-scroll" ref="messagess">
+        <div class="h-48 overflow-y-scroll" ref="messagess">
             <div class="container" v-for="message in messages" :key="message">
                 <!-- <img src="https://cdn1.iconfinder.com/data/icons/website-internet/48/website_-_male_user-512.png" style="width:100%;" /> -->
                 <p>{{message.data}}</p>
@@ -26,6 +26,8 @@ export default {
               send(){
                      this.$emit('messageSend',this.content)
                      this.content=null
+                      let messages = this.$refs.messagess;
+                      console.log(messages)
               }
        }
        ,

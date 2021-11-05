@@ -6,22 +6,30 @@
       <div  :class="userCheck?'w-3/4 bg-blue-500 grid  grid-cols-2 gap-4':'w-3/4 bg-red-500'" ref="main">
             <div class="flex" v-for="user in users" :key="user.id">
                 <p>{{user.name}}</p>
-              <video class="m-auto h-56" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
-              <video  class="m-auto h-56 " v-else  :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
+              <video class="object-cover m-auto h-56" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
+              <video  class="object-cover m-auto h-56 " v-else  :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
             </div>
             <div  class="flex">
                 <!-- <p>my video</p> -->
-                <video :class="userCheck?'m-auto max-w-56 h-56':'m-auto rounded-full h-96'" v-if="stream" ref="video-here" autoplay></video>
+                <video
+                v-if="stream"
+                :class="userCheck?'m-auto max-w-56 h-56 object-cover':'object-cover m-auto h-96'"
+                :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
+                ref="video-here" autoplay></video>
                 <img :class="userCheck?`m-auto rounded-full object-cover h-64`:'m-auto rounded-full h-96'" v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/>
             </div>
        </div>
-
+        <video-set :streamPermision="streamPermision" @close="close"/>
        <div class="w-1/4 bg-red-400">
           <message-container :messages="messages" @messageSend="messageSend"/>
+        <button
+        @click="showVideo" 
+        class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+          비디오 켜기</button>
        </div>
     </div>
-   
-    
+
+
 
     <!-- <div v-for="user in users" :key="user.id">
         <h1 :ref="user.name">{{user.name}}</h1>
@@ -35,12 +43,16 @@ import Peer from 'simple-peer';
 import AppLayout from '@/Layouts/AppLayout.vue'
 import axios from 'axios'
 import MessageContainer from './MessageContainer.vue';
+import Button from '../../Jetstream/Button.vue';
+import VideoSet from './VideoSet.vue'
 export default {
   props: ['user','roomId'],
   data() {
     return {
       channel: null,
       stream: null,
+      streamPermision:null,
+      show:false,
       peers: {},
       users:[],
       messages:[]
@@ -49,6 +61,8 @@ export default {
    components:{
       AppLayout,
       MessageContainer,
+      Button,
+      VideoSet
     },
 
   beforeUnmount(){
@@ -57,6 +71,7 @@ export default {
 
   },
   mounted() {
+      console.log(this.$page.props.user.profile_photo_url)
     this.setupVideoChat()
     // console.log(this.$page.pro)
 
@@ -77,7 +92,7 @@ export default {
               userName:this.user.name,
               data:content
            });
-        this.messages.push({  
+        this.messages.push({
              userId: this.user.id,
               userName:this.user.name,
               data:content})
@@ -134,17 +149,50 @@ export default {
       }
       return this.peers[userId];
     },
-    async setupVideoChat() {
+    close(permision){
+        if(permision){
+           const videoHere = this.$refs['video-here'];
+          videoHere.srcObject = this.streamPermision;
+          this.stream = streamPermision;
+        }
+        else{
+          this.stream=null
+        }
+    },
+    async showVideo(){
       try{
-        const stream = await navigator.mediaDevices.getUserMedia({audio: true });
-      const videoHere = this.$refs['video-here'];
-      videoHere.srcObject = stream;
-      this.stream = stream;
+        const streamPermision = await navigator.mediaDevices.getUserMedia({video:true,audio: true });
+        if(streamPermision){
+          this.streamPermision=streamPermision
+          this.show=true
+        }
+        else{
+          this.stream=null
+        }
       }catch(err){
        this.stream = null;
+      //  alert('비디오가 없음니다')
       }
-     
-      console.log(this.roomId)
+      
+    },
+    // async CameraSet(stream){
+    //   await this.showVideo()
+    //   const videoHere = this.$refs['video-here'];
+    //   videoHere.srcObject = stream;
+    //   this.stream = stream;
+    // }
+    // ,
+    async setupVideoChat() {
+      // try{
+      //   const stream = await navigator.mediaDevices.getUserMedia({video:true,audio: true });
+      //   if(stream){
+      //     this.showVideo(stream)
+      //   }
+      // }catch(err){
+      //  this.stream = null;
+      // }
+      this.showVideo()
+
        this.channel=window.Echo.join('presence-video-chat.'+this.roomId)
         .here((users) => {
          console.log(users)
@@ -174,35 +222,8 @@ export default {
                      console.log(message)
                      this.messages.push(message)
               });
+        console.log(this.channel)
     },
-    
   }
 };
 </script>
-<style>
-/* .video-container {
-  width: 90%;
-  height: 700px;
-  margin: 8px auto;
-  border: 3px solid #000;
-  position: relative;
-  box-shadow: 1px 1px 1px #9e9e9e;
-}
-.video-here {
-  width: 130px;
-  position: absolute;
-  left: 10px;
-  bottom: 16px;
-  border: 1px solid #000;
-  border-radius: 2px;
-  z-index: 2;
-}
-.video-there {
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-.text-right {
-  text-align: right;
-} */
-</style>
