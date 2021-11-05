@@ -12,21 +12,25 @@
             <div  class="flex">
                 <!-- <p>my video</p> -->
                 <video
-                v-if="stream"
                 :class="userCheck?'m-auto max-w-56 h-56 object-cover':'object-cover m-auto h-96'"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
-                <img :class="userCheck?`m-auto rounded-full object-cover h-64`:'m-auto rounded-full h-96'" v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/>
+                <!-- <img :class="userCheck?`m-auto rounded-full object-cover h-64`:'m-auto rounded-full h-96'" v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/> -->
             </div>
        </div>
-        <video-set :streamPermision="streamPermision" @close="close"/>
+        <video-set :show="show" :stream="streamPermision" @close="close"/>
        <div class="w-1/4 bg-red-400">
           <message-container :messages="messages" @messageSend="messageSend"/>
         <button
-        @click="showVideo" 
+        @click="showVideo"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
           비디오 켜기</button>
        </div>
+        <button
+        @click="closeVideo"
+        class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+          비디오 끄기</button>
+
     </div>
 
 
@@ -131,7 +135,7 @@ export default {
             userName:this.user.name,
             data: data
           });
-          console.log(this.channel)
+
 
         })
         .on('stream', (stream) => {
@@ -143,6 +147,7 @@ export default {
           if(peer !== undefined) {
             peer.destroy();
           }
+          console.log('피어 쪽닫힘')
           delete this.peers[userId];
         });
         this.peers[userId] = peer;
@@ -150,15 +155,41 @@ export default {
       return this.peers[userId];
     },
     close(permision){
+        this.show=false;
         if(permision){
            const videoHere = this.$refs['video-here'];
+        //    console.log(videoHere)
           videoHere.srcObject = this.streamPermision;
-          this.stream = streamPermision;
+          this.stream = this.streamPermision;
+
+//           this.$refs['video-here'].videoTracks.addEventListener('addtrack', (event) => {
+//   console.log(`Video track: ${event.track.label} added`);
+// });
+//             this.$refs['video-here'].videoTracks.onaddtrack = (event) => {
+//   console.log(`Video track: ${event.track.label} added`);
+// };
+
+            for(let i=0;i<this.users.length;i++){
+                // this.peers[this.users[i].id].addStream(this.streamPermision)
+                this.getPeer(this.users[i].id,this.users[i].name,true)
+                // console.log(this.peers[this.users[i].id])
+                console.log(this.peers[this.users[i].id])
+           }
         }
         else{
           this.stream=null
         }
     },
+    closeVideo(){
+         this.stream.getTracks().forEach(function(track) {
+            if(track.kind=='video'){
+                track.enabled=!track.enabled
+            }
+
+            });
+                console.log(this.$refs['video-here'])
+    }
+    ,
     async showVideo(){
       try{
         const streamPermision = await navigator.mediaDevices.getUserMedia({video:true,audio: true });
@@ -173,7 +204,7 @@ export default {
        this.stream = null;
       //  alert('비디오가 없음니다')
       }
-      
+
     },
     // async CameraSet(stream){
     //   await this.showVideo()
@@ -201,7 +232,7 @@ export default {
                 if(this.user.id!=users[i].id){
                     console.log(users[i])
                     this.users.push(users[i])
-                     this.getPeer(users[i].id,users[i].name,true)
+                    //  this.getPeer(users[i].id,users[i].name,true)
                 }
             }
           }
@@ -213,6 +244,12 @@ export default {
      })
       .leaving((user) => {
           this.users.splice(this.users.indexOf(user), 1);
+        const peer = this.peers[user.id];
+        if(peer !== undefined) {
+            peer.destroy();
+          }
+          console.log('유저 나감')
+          delete this.peers[user.id];
       })
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
           const peer = this.getPeer(signal.userId,signal.userName ,false);

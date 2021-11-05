@@ -3,7 +3,7 @@
                <template v-slot:title>
                  <h1 class="block w-full text-center text-gray-800 text-2xl font-bold mb-6">얼굴을 봐라</h1>
                </template>
-                
+
 
               <template v-slot:content>
                      <video
@@ -13,13 +13,13 @@
               </template>
 
        </dialog-modal>
-       
+
 </template>
 
 <script>
 import DialogModal from'@/Jetstream/DialogModal.vue';
 export default {
-       props:['stream'],
+       props:['stream','show'],
        components:{
               DialogModal
        },
@@ -27,25 +27,35 @@ export default {
        //        const videoHere = this.$refs['video'];
        //         videoHere.srcObject = this.stream;
        // },
-        watch: {
-        stream() {
-            const videoHere = this.$refs['video'];
-              videoHere.srcObject = this.stream;
-        },
-    },
+       updated(){
+                const videoHere = this.$refs['video'];
+                if(videoHere){
+                    videoHere.srcObject = this.stream;
+                    console.log(this.stream)
+                }
+       },
+        // watch: {
+        // stream() {
+        //     const videoHere = this.$refs['video'];
+        //       videoHere.srcObject = this.stream;
+        //       console.log(this.stream)
+        // },
+    // },
        data(){
               return{
-                    permision:false
+                    permision:false,
+                    // show:this.show
               }
        }
        ,
        methods:{
               faceOkay(){
                      this.permision=true
-              },
-             close(){
                      this.$emit('close',this.permision)
-             }
+              },
+            //  close(){
+            //          this.$emit('close',this.permision)
+            //  }
        }
 }
 </script>
