@@ -59,7 +59,8 @@ export default {
       show:false,
       peers: {},
       users:[],
-      messages:[]
+      messages:[],
+      actives:null,
     }
   },
    components:{
@@ -75,11 +76,16 @@ export default {
 
   },
   mounted() {
-      console.log(this.$page.props.user.profile_photo_url)
     this.setupVideoChat()
     // console.log(this.$page.pro)
 
   },
+  watch:{
+    actives:function(){
+      console.log(this.actives)
+    }
+  }
+  ,
   computed:{
     userCheck(){
       if(this.users.length){
@@ -158,22 +164,13 @@ export default {
         this.show=false;
         if(permision){
            const videoHere = this.$refs['video-here'];
-        //    console.log(videoHere)
           videoHere.srcObject = this.streamPermision;
           this.stream = this.streamPermision;
-
-//           this.$refs['video-here'].videoTracks.addEventListener('addtrack', (event) => {
-//   console.log(`Video track: ${event.track.label} added`);
-// });
-//             this.$refs['video-here'].videoTracks.onaddtrack = (event) => {
-//   console.log(`Video track: ${event.track.label} added`);
-// };
 
             for(let i=0;i<this.users.length;i++){
                 // this.peers[this.users[i].id].addStream(this.streamPermision)
                 this.getPeer(this.users[i].id,this.users[i].name,true)
-                // console.log(this.peers[this.users[i].id])
-                console.log(this.peers[this.users[i].id])
+
            }
         }
         else{
@@ -181,13 +178,15 @@ export default {
         }
     },
     closeVideo(){
+        let acc=null;
          this.stream.getTracks().forEach(function(track) {
             if(track.kind=='video'){
+                acc=track
                 track.enabled=!track.enabled
             }
 
             });
-                console.log(this.$refs['video-here'])
+            console.log(acc.enabled)
     }
     ,
     async showVideo(){
@@ -206,22 +205,8 @@ export default {
       }
 
     },
-    // async CameraSet(stream){
-    //   await this.showVideo()
-    //   const videoHere = this.$refs['video-here'];
-    //   videoHere.srcObject = stream;
-    //   this.stream = stream;
-    // }
-    // ,
     async setupVideoChat() {
-      // try{
-      //   const stream = await navigator.mediaDevices.getUserMedia({video:true,audio: true });
-      //   if(stream){
-      //     this.showVideo(stream)
-      //   }
-      // }catch(err){
-      //  this.stream = null;
-      // }
+
       this.showVideo()
 
        this.channel=window.Echo.join('presence-video-chat.'+this.roomId)
@@ -259,7 +244,7 @@ export default {
                      console.log(message)
                      this.messages.push(message)
               });
-        console.log(this.channel)
+
     },
   }
 };
