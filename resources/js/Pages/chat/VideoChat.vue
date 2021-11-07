@@ -22,9 +22,9 @@
        <div class="w-1/4 bg-red-400">
           <message-container :messages="messages" @messageSend="messageSend"/>
         <button
-        @click="showVideo"
+        @click="closeVideo"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
-         {{ activeVideo?'비디오 켜기':'비디오 끄기' }}</button>
+         {{ activeVideo?'비디오 끄기':'비디오 켜기' }}</button>
        </div>
     </div>
 
@@ -150,7 +150,7 @@ export default {
     },
     close(permision){
         this.show=false;
-      
+
         const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.streamPermision;
         this.stream=this.streamPermision
@@ -164,18 +164,18 @@ export default {
         for(let i=0;i<this.users.length;i++){
               this.getPeer(this.users[i].id,this.users[i].name,true)
           }
-        
-        
+
+
     },
     closeVideo(){
+        const vm=this
          this.stream.getTracks().forEach(function(track) {
             if(track.kind=='video'){
-                acc=track
                 track.enabled=!track.enabled
-                this.activeVideo=track.enabled
+                vm.activeVideo=track.enabled
                 }
             });
-           
+
     }
     ,
     async showVideo(){
@@ -195,7 +195,7 @@ export default {
 
     },
     async setupVideoChat() {
-      
+
       this.showVideo()
 
        this.channel=window.Echo.join('presence-video-chat.'+this.roomId)
