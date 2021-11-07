@@ -164,10 +164,10 @@ export default {
           const vm=this
            this.streamPermision.getTracks().forEach(function(track) {
             if(track.kind=='video'){
-                  // vm.stream.addTrack(track)
-                  for(let i=0;i<vm.users.length;i++){
-                vm.peers[vm.users[i].id].addTrack(track)
-                // this.getPeer(this.users[i].id,this.users[i].name,true)
+                for(let i=0;i<vm.users.length;i++){
+                vm.peers[vm.users[i].id].destroy()
+                delete this.peers[vm.users[i].id]
+                this.getPeer(vm.users[i].id,vm.users[i].name,true)
 
            }
 
@@ -199,7 +199,7 @@ export default {
     ,
     async showVideo(){
       try{
-        const streamPermision = await navigator.mediaDevices.getUserMedia({video:true });
+        const streamPermision = await navigator.mediaDevices.getUserMedia({video:true,audio: true  });
         if(streamPermision){
           this.streamPermision=streamPermision
           this.show=true
