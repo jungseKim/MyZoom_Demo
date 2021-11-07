@@ -60,7 +60,6 @@ export default {
       peers: {},
       users:[],
       messages:[],
-      actives:null,
     }
   },
    components:{
@@ -77,13 +76,8 @@ export default {
   },
   mounted() {
     this.setupVideoChat()
-    // console.log(this.$page.pro)
+    this.stream=new MediaStream()
 
-  },
-  watch:{
-    actives:function(){
-      console.log(this.actives)
-    }
   }
   ,
   computed:{
@@ -108,7 +102,7 @@ export default {
               data:content})
     },
     start(){
-      console.log(this.users)
+      console.log(this.channel)
       console.log(this.$refs.main.class)
     },
     RoomOut(){
@@ -147,6 +141,7 @@ export default {
         .on('stream', (stream) => {
           const videoThere = this.$refs[userName];
           videoThere.srcObject = stream;
+          console.log(stream)
         })
         .on('close', () => {
           const peer = this.peers[userId];
@@ -165,17 +160,30 @@ export default {
         if(permision){
            const videoHere = this.$refs['video-here'];
           videoHere.srcObject = this.streamPermision;
-          this.stream = this.streamPermision;
 
-            for(let i=0;i<this.users.length;i++){
-                // this.peers[this.users[i].id].addStream(this.streamPermision)
-                this.getPeer(this.users[i].id,this.users[i].name,true)
+          const vm=this
+           this.streamPermision.getTracks().forEach(function(track) {
+            if(track.kind=='video'){
+                  // vm.stream.addTrack(track)
+                  for(let i=0;i<vm.users.length;i++){
+                vm.peers[vm.users[i].id].addTrack(track)
+                // this.getPeer(this.users[i].id,this.users[i].name,true)
 
            }
+
+            }
+
+            });
+
+          //   for(let i=0;i<this.users.length;i++){
+          //       // this.peers[this.users[i].id].addStream(this.streamPermision)
+          //       this.getPeer(this.users[i].id,this.users[i].name,true)
+
+          //  }
         }
-        else{
-          this.stream=null
-        }
+        // else{
+        //   this.stream=null
+        // }
     },
     closeVideo(){
         let acc=null;
@@ -191,7 +199,7 @@ export default {
     ,
     async showVideo(){
       try{
-        const streamPermision = await navigator.mediaDevices.getUserMedia({video:true,audio: true });
+        const streamPermision = await navigator.mediaDevices.getUserMedia({video:true });
         if(streamPermision){
           this.streamPermision=streamPermision
           this.show=true
@@ -206,8 +214,15 @@ export default {
 
     },
     async setupVideoChat() {
+      const Audio = await navigator.mediaDevices.getUserMedia({audio: true });
+      const vm=this
+      Audio.getTracks().forEach(function(track) {
+            if(track.kind=='audio'){
+                vm.stream.addTrack(track)
+            }})
 
-      this.showVideo()
+
+      // this.showVideo()
 
        this.channel=window.Echo.join('presence-video-chat.'+this.roomId)
         .here((users) => {
@@ -217,7 +232,7 @@ export default {
                 if(this.user.id!=users[i].id){
                     console.log(users[i])
                     this.users.push(users[i])
-                    //  this.getPeer(users[i].id,users[i].name,true)
+                     this.getPeer(users[i].id,users[i].name,true)
                 }
             }
           }
