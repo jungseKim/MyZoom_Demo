@@ -9,7 +9,15 @@
                      <video
                 class="m-auto max-w-56 h-56 object-cover"
                 ref="video" autoplay></video>
-                     <button @click="faceOkay" class="block bg-green-400 hover:bg-green-600 text-white uppercase text-lg mx-auto p-4 rounded" >Save</button>
+                     <button
+                      @click="faceOkay(true)" 
+                      class="block bg-green-400 hover:bg-green-600 text-white uppercase text-lg mx-auto p-4 rounded" >
+                            On
+                     </button>
+                      <button 
+                       @click="faceOkay(false)"
+                      class="p-2 pl-5 pr-5 bg-yellow-500 text-gray-100 text-lg rounded-lg focus:border-4 border-yellow-300">
+                             Off</button>
               </template>
 
        </dialog-modal>
@@ -34,28 +42,19 @@ export default {
                     console.log(this.stream)
                 }
        },
-        // watch: {
-        // stream() {
-        //     const videoHere = this.$refs['video'];
-        //       videoHere.srcObject = this.stream;
-        //       console.log(this.stream)
-        // },
-    // },
+    
        data(){
               return{
                     permision:false,
-                    // show:this.show
               }
        }
        ,
        methods:{
-              faceOkay(){
-                     this.permision=true
+              faceOkay(check){
+                     this.permision=check
                      this.$emit('close',this.permision)
               },
-            //  close(){
-            //          this.$emit('close',this.permision)
-            //  }
+             
        }
 }
 </script>

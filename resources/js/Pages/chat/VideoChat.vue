@@ -24,13 +24,8 @@
         <button
         @click="showVideo"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
-          비디오 켜기</button>
+         {{ activeVideo?'비디오 켜기':'비디오 끄기' }}</button>
        </div>
-        <button
-        @click="closeVideo"
-        class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
-          비디오 끄기</button>
-
     </div>
 
 
@@ -60,6 +55,7 @@ export default {
       peers: {},
       users:[],
       messages:[],
+      activeVideo:true
     }
   },
    components:{
@@ -134,7 +130,6 @@ export default {
             data: data
           });
 
-
         })
         .on('stream', (stream) => {
           const videoThere = this.$refs[userName];
@@ -155,28 +150,32 @@ export default {
     },
     close(permision){
         this.show=false;
-        if(permision){
-          const videoHere = this.$refs['video-here'];
-          videoHere.srcObject = this.streamPermision;
-          this.stream=this.streamPermision
+      
+        const videoHere = this.$refs['video-here'];
+        videoHere.srcObject = this.streamPermision;
+        this.stream=this.streamPermision
 
-         for(let i=0;i<this.users.length;i++){
-                this.getPeer(this.users[i].id,this.users[i].name,true)
-
-           }
-        }
+        if(!permision){
+              this.closeVideo()
+          }
+          else{
+            this.activeVideo=true
+          }
+        for(let i=0;i<this.users.length;i++){
+              this.getPeer(this.users[i].id,this.users[i].name,true)
+          }
+        
         
     },
     closeVideo(){
-        let acc=null;
          this.stream.getTracks().forEach(function(track) {
             if(track.kind=='video'){
                 acc=track
                 track.enabled=!track.enabled
-            }
-
+                this.activeVideo=track.enabled
+                }
             });
-            console.log(acc.enabled)
+           
     }
     ,
     async showVideo(){
