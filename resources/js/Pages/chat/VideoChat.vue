@@ -76,8 +76,6 @@ export default {
   },
   mounted() {
     this.setupVideoChat()
-    this.stream=new MediaStream()
-
   }
   ,
   computed:{
@@ -158,32 +156,16 @@ export default {
     close(permision){
         this.show=false;
         if(permision){
-           const videoHere = this.$refs['video-here'];
+          const videoHere = this.$refs['video-here'];
           videoHere.srcObject = this.streamPermision;
+          this.stream=this.streamPermision
 
-          const vm=this
-           this.streamPermision.getTracks().forEach(function(track) {
-            if(track.kind=='video'){
-                for(let i=0;i<vm.users.length;i++){
-                vm.peers[vm.users[i].id].destroy()
-                delete this.peers[vm.users[i].id]
-                this.getPeer(vm.users[i].id,vm.users[i].name,true)
+         for(let i=0;i<this.users.length;i++){
+                this.getPeer(this.users[i].id,this.users[i].name,true)
 
            }
-
-            }
-
-            });
-
-          //   for(let i=0;i<this.users.length;i++){
-          //       // this.peers[this.users[i].id].addStream(this.streamPermision)
-          //       this.getPeer(this.users[i].id,this.users[i].name,true)
-
-          //  }
         }
-        // else{
-        //   this.stream=null
-        // }
+        
     },
     closeVideo(){
         let acc=null;
@@ -214,15 +196,8 @@ export default {
 
     },
     async setupVideoChat() {
-      const Audio = await navigator.mediaDevices.getUserMedia({audio: true });
-      const vm=this
-      Audio.getTracks().forEach(function(track) {
-            if(track.kind=='audio'){
-                vm.stream.addTrack(track)
-            }})
-
-
-      // this.showVideo()
+      
+      this.showVideo()
 
        this.channel=window.Echo.join('presence-video-chat.'+this.roomId)
         .here((users) => {
@@ -232,7 +207,7 @@ export default {
                 if(this.user.id!=users[i].id){
                     console.log(users[i])
                     this.users.push(users[i])
-                     this.getPeer(users[i].id,users[i].name,true)
+                    //  this.getPeer(users[i].id,users[i].name,true)
                 }
             }
           }
