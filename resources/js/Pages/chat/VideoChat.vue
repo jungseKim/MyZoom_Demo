@@ -21,10 +21,16 @@
         <video-set :show="show" :stream="streamPermision" @close="close"/>
        <div class="w-1/4 bg-red-400">
           <message-container :messages="messages" @messageSend="messageSend"/>
-        <button
+         <div>
+          <button
         @click="closeVideo"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          {{ activeVideo?'비디오 끄기':'비디오 켜기' }}</button>
+          <button
+          @click="closeAudio"
+          class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+         {{ activeVideo?'음소거':'오디오 키기' }}</button>
+         </div>
        </div>
     </div>
 
@@ -55,7 +61,8 @@ export default {
       peers: {},
       users:[],
       messages:[],
-      activeVideo:true
+      activeVideo:true,
+      activeOudio:true
     }
   },
    components:{
@@ -96,8 +103,7 @@ export default {
               data:content})
     },
     start(){
-      console.log(this.channel)
-      console.log(this.$refs.main.class)
+      this.stream=null;
     },
     RoomOut(){
    if(this.stream){
@@ -150,10 +156,10 @@ export default {
     },
     close(permision){
         this.show=false;
-
+      
         const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.streamPermision;
-        this.stream=this.streamPermision
+       
 
         if(!permision){
               this.closeVideo()
@@ -161,46 +167,70 @@ export default {
           else{
             this.activeVideo=true
           }
-        for(let i=0;i<this.users.length;i++){
-              this.getPeer(this.users[i].id,this.users[i].name,true)
-          }
-
-
+       this.peerConnetion()
+        
+        
     },
     closeVideo(){
-        const vm=this
+       const vm=this
          this.stream.getTracks().forEach(function(track) {
             if(track.kind=='video'){
                 track.enabled=!track.enabled
                 vm.activeVideo=track.enabled
                 }
             });
-
+    },
+    closeAudio(){
+      const vm=this
+         this.stream.getTracks().forEach(function(track) {
+            if(track.kind=='audio'){
+                track.enabled=!track.enabled
+                vm.activeOudio=track.enabled
+                }
+            });
     }
+
     ,
     async showVideo(){
       try{
-        const streamPermision = await navigator.mediaDevices.getUserMedia({video:true,audio: true  });
+        let streamPermision = await navigator.mediaDevices.getUserMedia({video:true,audio: true  });
         if(streamPermision){
+          this.stream=this.streamPermision
           this.streamPermision=streamPermision
           this.show=true
         }
         else{
           this.stream=null
         }
-      }catch(err){
-       this.stream = null;
-      //  alert('비디오가 없음니다')
       }
-
+      catch(err){
+         this.streamPermision = await navigator.mediaDevices.getUserMedia({audio: true  });
+         this.stream=this.streamPermision
+    //   let streamPermision = await navigator.mediaDevices.getUserMedia({audio: true  });
+      //  if(streamPermision){
+      //    this.stream = streamPermision;
+      //    this.peerConnetion()
+      //   }
+      this.peerConnetion()
+      }
+      // finally{
+      //   this.peerConnetion()
+      // }
     },
+    peerConnetion(){
+      console.log('자신의 음성은 인식안됨')
+      for(let i=0;i<this.users.length;i++){
+                this.getPeer(this.users[i].id,this.users[i].name,true)
+            }
+    }
+    ,
     async setupVideoChat() {
-
-      this.showVideo()
-
-       this.channel=window.Echo.join('presence-video-chat.'+this.roomId)
+      
+     
+    const vm=this
+    this.channel=await window.Echo.join('presence-video-chat.'+this.roomId)
         .here((users) => {
-         console.log(users)
+          console.log(users)
           if(users){
             for(let i=0;i<users.length;i++){
                 if(this.user.id!=users[i].id){
@@ -210,10 +240,10 @@ export default {
                 }
             }
           }
+          vm.showVideo()
       })
       .joining((user) => {
           this.users.push(user)
-          console.log(user)
           console.log("evnet !!!!!!!!!")
      })
       .leaving((user) => {
@@ -233,7 +263,7 @@ export default {
                      console.log(message)
                      this.messages.push(message)
               });
-
+      // this.showVideo()
     },
   }
 };
