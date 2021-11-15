@@ -18,6 +18,10 @@
                 <!-- <img :class="userCheck?`m-auto rounded-full object-cover h-64`:'m-auto rounded-full h-96'" v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/> -->
             </div>
        </div>
+      <!-- <div v-if="SharedScreen"> 
+      </div> -->
+          <video v-if="SharedScreen" class="m-auto max-w-56 h-56 object-cover" ref="SharedScreen" autoplay></video>
+
         <video-set :show="show" :stream="streamPermision" @close="close"/>
        <div class="w-1/4 bg-red-400">
           <message-container :messages="messages" @messageSend="messageSend"/>
@@ -51,7 +55,7 @@ import MessageContainer from './MessageContainer.vue';
 import Button from '../../Jetstream/Button.vue';
 import VideoSet from './VideoSet.vue'
 export default {
-  props: ['user','roomId'],
+  props: ['user','roomId','idManager'],
   data() {
     return {
       channel: null,
@@ -62,7 +66,8 @@ export default {
       users:[],
       messages:[],
       activeVideo:true,
-      activeOudio:true
+      activeOudio:true,
+      SharedScreen:false
     }
   },
    components:{
@@ -102,8 +107,25 @@ export default {
               userName:this.user.name,
               data:content})
     },
-    start(){
-      this.stream=null;
+    async start(){
+      // this.stream=null;
+          const vm=this
+            await navigator.mediaDevices.getDisplayMedia({
+            // audio: true,
+            video: true
+          }).then(function(stream){
+               const videoHere = vm.$refs['video-here'];
+               videoHere.srcObject =stream
+               console.log(stream)
+              for(let i=0;i<vm.users.length;i++){
+                vm.getPeer(vm.users[i].id,vm.users[i].name,true,stream,'SharedScreen')
+            }
+
+          }).catch(function(e){
+              console.log(e)
+          });
+    //  document.documentElement.requestFullscreen()
+
     },
     RoomOut(){
    if(this.stream){
@@ -122,25 +144,26 @@ export default {
       } )
     }
     ,
-    getPeer(userId,userName, initiator) {
+    getPeer(userId,userName, initiator,stream=this.stream,myName=this.user.name) {
       if(this.peers[userId] === undefined) {
         let peer = new Peer({
           initiator,//이거때문에 시그널 바로실행
-          stream: this.stream,
+          stream: stream,
           trickle: false
         });
         peer.on('signal', (data) => {
           this.channel.whisper(`client-signal-${userId}`, {
             userId: this.user.id,
-            userName:this.user.name,
+            userName:myName,
             data: data
           });
 
         })
         .on('stream', (stream) => {
+          console.log(userName)
           const videoThere = this.$refs[userName];
           videoThere.srcObject = stream;
-          console.log(stream)
+          console.log(videoThere)
         })
         .on('close', () => {
           const peer = this.peers[userId];
@@ -258,6 +281,9 @@ export default {
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
           const peer = this.getPeer(signal.userId,signal.userName ,false);
           peer.signal(signal.data);
+          if(signal.userName=='SharedScreen'){
+            this.SharedScreen=true
+          }
            })
       .listenForWhisper('client-message-'+this.roomId,(message)=>{
                      console.log(message)
