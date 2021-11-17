@@ -122,21 +122,36 @@ export default {
               data:content})
     },
     async start(){
+         console.log(this.SharedScreen)
           const vm=this
-          this.SharedScreen=true
+          if(!this.SharedScreen){
+              this.SharedScreen=true
           await navigator.mediaDevices.getDisplayMedia({
             video: true
           }).then(function(stream){
-               const videoHere = vm.$refs['SharedScreen'];
-               console.log(videoHere)
-               console.log(stream)
-               videoHere.srcObject =stream
+            //    const videoHere = vm.$refs['SharedScreen'];
+            //    videoHere.srcObject =stream
+            vm.SharedStream=stream
               for(let i=0;i<vm.users.length;i++){
                 vm.getPeer(vm.users[i].id,'SharedScreen',true,stream,'SharedScreen')
             }
+
           }).catch(function(e){
               console.log(e)
           });
+          }else{
+
+              this.SharedScreen=false
+              this.SharedStream.getTracks().forEach(function(track) {
+                track.stop();
+                });
+            for(let i=0;i<this.users.length;i++){
+            this.peers[this.users[i].id+'SharedScreen'].destroy()
+            delete this.peers[this.users[i].id+'SharedScreen'];
+
+        }
+
+          }
           this.videoCom();
     //  document.documentElement.requestFullscreen()
 
@@ -147,28 +162,31 @@ export default {
     track.stop();
     });
    }
-    // if(this.peers){
-    //     this.peers.forEach(function(p){
-    //     p.close()
-    // })
-    // }
+
+    for (let key in this.peers) {
+                const p = this.peers[key]
+                p.destroy()
+
+                }
      axios.delete('/chat/'+this.roomId+'/room')
       .then(res=>{
         console.log(res.data)
       } )
     },
     videoCom(){
-      if(!this.isManager){
+      if(this.SharedScreen){
         const share= this.$refs['SharedScreen']
-        console.log(videoThere)
+        // console.log(videoThere)
         share.srcObject=this.SharedStream
         console.log(this.SharedStream)
 
       }
         for(let i=0;i<this.users.length;i++){
+            //   console.log(this.users[i])
             if(this.users[i].stream){
                const videoThere = this.$refs[this.users[i].name];
                videoThere.srcObject = this.users[i].stream;
+            //    console.log(videoThere)
             }
         }
     }
@@ -190,15 +208,18 @@ export default {
         })
         .on('stream', (stream) => {
           console.log('스트림 받아옴')
+          console.log(userId)
         //   this.users[userId].stream=stream;
-      
-        if(userName='SharedScreen'){
+
+        if(userName=='SharedScreen'){
             this.SharedStream=stream
         }
         else{
+            console.log('aa')
           for(let i=0;i<this.users.length;i++){
             if(this.users[i].id==userId){
                 this.users[i].stream=stream;
+                console.log(this.users[i])
             }
         }
         }
