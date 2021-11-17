@@ -42,6 +42,10 @@
     </div >
     <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
         <button
+        @click="start"
+        class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+         화면 공유</button>
+        <button
         @click="closeVideo"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          {{ activeVideo?'비디오 끄기':'비디오 켜기' }}</button>
@@ -53,12 +57,6 @@
 
 
 
-
-    <!-- <div v-for="user in users" :key="user.id">
-        <h1 :ref="user.name">{{user.name}}</h1>
-         </div> -->
-    <button @click="start">test</button>
-  <!-- </div> -->
 </app-layout>
 </template>
 <script>
@@ -69,7 +67,7 @@ import MessageContainer from './MessageContainer.vue';
 import Button from '../../Jetstream/Button.vue';
 import VideoSet from './VideoSet.vue'
 export default {
-  props: ['user','roomId','idManager'],
+  props: ['user','roomId','isManager'],
   data() {
     return {
       channel: null,
@@ -81,7 +79,8 @@ export default {
       messages:[],
       activeVideo:true,
       activeOudio:true,
-      SharedScreen:false
+      SharedScreen:false,
+      SharedStream:null
     }
   },
    components:{
@@ -111,6 +110,7 @@ export default {
   },
   methods: {
     messageSend(content){
+        console.log(this.peers)
         this.channel.whisper('client-message-'+this.roomId, {
               userId: this.user.id,
               userName:this.user.name,
@@ -129,9 +129,10 @@ export default {
           }).then(function(stream){
                const videoHere = vm.$refs['SharedScreen'];
                console.log(videoHere)
+               console.log(stream)
                videoHere.srcObject =stream
               for(let i=0;i<vm.users.length;i++){
-                vm.getPeer(vm.users[i].id,vm.users[i].name,true,stream,'SharedScreen')
+                vm.getPeer(vm.users[i].id,'SharedScreen',true,stream,'SharedScreen')
             }
           }).catch(function(e){
               console.log(e)
@@ -157,6 +158,13 @@ export default {
       } )
     },
     videoCom(){
+      if(!this.isManager){
+        const share= this.$refs['SharedScreen']
+        console.log(videoThere)
+        share.srcObject=this.SharedStream
+        console.log(this.SharedStream)
+
+      }
         for(let i=0;i<this.users.length;i++){
             if(this.users[i].stream){
                const videoThere = this.$refs[this.users[i].name];
@@ -166,7 +174,7 @@ export default {
     }
     ,
     getPeer(userId,userName, initiator,stream=this.stream,myName=this.user.name) {
-      if(this.peers[userId] === undefined) {
+      if(this.peers[userId+userName] === undefined) {
         let peer = new Peer({
           initiator,//이거때문에 시그널 바로실행
           stream: stream,
@@ -183,11 +191,16 @@ export default {
         .on('stream', (stream) => {
           console.log('스트림 받아옴')
         //   this.users[userId].stream=stream;
-
-        for(let i=0;i<this.users.length;i++){
+      
+        if(userName='SharedScreen'){
+            this.SharedStream=stream
+        }
+        else{
+          for(let i=0;i<this.users.length;i++){
             if(this.users[i].id==userId){
                 this.users[i].stream=stream;
             }
+        }
         }
         this.videoCom()
 
@@ -196,16 +209,16 @@ export default {
         //   console.log(videoThere)
         })
         .on('close', () => {
-          const peer = this.peers[userId];
+          const peer = this.peers[userId+userName];
           if(peer !== undefined) {
             peer.destroy();
           }
           console.log('피어 쪽닫힘')
-          delete this.peers[userId];
+          delete this.peers[userId+userName];
         });
-        this.peers[userId] = peer;
+        this.peers[userId+userName] = peer;
       }
-      return this.peers[userId];
+      return this.peers[userId+userName];
     },
     close(permision){
         this.show=false;
@@ -254,33 +267,33 @@ export default {
         }
         else{
           this.stream=null
+           this.peerConnetion()
         }
       }
       catch(err){
-         this.streamPermision = await navigator.mediaDevices.getUserMedia({audio: true  });
-         this.stream=this.streamPermision
-    //   let streamPermision = await navigator.mediaDevices.getUserMedia({audio: true  });
-      //  if(streamPermision){
-      //    this.stream = streamPermision;
-      //    this.peerConnetion()
-      //   }
-      this.peerConnetion()
+         try{
+           this.streamPermision = await navigator.mediaDevices.getUserMedia({audio: true  });
+          if(streamPermision){
+            this.stream = streamPermision;
+            this.peerConnetion()
+            }
+            else{
+              this.stream=null
+               this.peerConnetion()
+            }
+         }catch(err){
+           this.peerConnetion()
+
+         }
       }
-      // finally{
-      //   this.peerConnetion()
-      // }
     },
     peerConnetion(){
-      console.log('자신의 음성은 인식안됨')
       for(let i=0;i<this.users.length;i++){
-
                 this.getPeer(this.users[i].id,this.users[i].name,true)
             }
     }
     ,
     async setupVideoChat() {
-
-
     const vm=this
     this.channel=await window.Echo.join('presence-video-chat.'+this.roomId)
         .here((users) => {
@@ -302,20 +315,23 @@ export default {
      })
       .leaving((user) => {
           this.users.splice(this.users.indexOf(user), 1);
-        const peer = this.peers[user.id];
+        const peer = this.peers[user.id+user.name];
         if(peer !== undefined) {
             peer.destroy();
           }
           console.log('유저 나감')
-          delete this.peers[user.id];
+          delete this.peers[user.id+user.name];
       })
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
-          const peer = this.getPeer(signal.userId,signal.userName ,false);
-          console.log(peer)
-         peer.signal(signal.data);
-          if(signal.userName=='SharedScreen'){
+          console.log(signal)
+        if(signal.userName=='SharedScreen'){
             this.SharedScreen=true
-            
+            const peer = this.getPeer(signal.userId,'SharedScreen' ,false,null,'SharedScreen');
+           peer.signal(signal.data);
+          }
+          else{
+            const peer = this.getPeer(signal.userId,signal.userName ,false);
+            peer.signal(signal.data);
           }
            })
       .listenForWhisper('client-message-'+this.roomId,(message)=>{

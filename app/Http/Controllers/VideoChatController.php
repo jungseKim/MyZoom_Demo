@@ -67,9 +67,12 @@ class VideoChatController extends Controller
     public function room(Request $request, $roomId)
     {
         $user = $request->user();
+        $room = Room::find($roomId);
         return Inertia::render('chat/VideoChat')->with([
             // 'user' => collect($request->user()->only(['id', 'name'])),
             'roomId' => $roomId,
+            'isManager' => $user->id == $room->user_id ? true : false
+
         ]);
     }
 }
