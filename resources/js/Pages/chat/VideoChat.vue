@@ -3,30 +3,45 @@
   <!-- <div class="container"> -->
     <h1 class="text-center">Laravel Video Chat</h1>
     <div class="w-full flex flex-rows bg-gray-800">
-      <div  :class="userCheck?'w-3/4 bg-blue-500 grid  grid-cols-2 gap-4':'w-3/4 bg-red-500'" ref="main">
+
+      <div v-if="SharedScreen">
+         <div class="flex flex-rows space-x-2 h-1/5">
+              <div class="flex" v-for="user in users" :key="user.id">
+              <video class="object-cover m-auto w-1/5" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
+              <video  class="object-cover m-auto w-1/5 " v-else  :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
+                <h1>{{user.name}}</h1>
+            </div>
+         </div>
+         <div>
+             <video class="m-auto h-2/5 object-cover mb-20" ref="SharedScreen" autoplay></video>
+         </div>
+      </div>
+
+      <div v-else  :class="userCheck?'w-3/4 bg-blue-500 grid  grid-cols-2 gap-4':'w-3/4 bg-red-500'" ref="main">
             <div class="flex" v-for="user in users" :key="user.id">
-                <p>{{user.name}}</p>
-              <video class="object-cover m-auto h-56" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
-              <video  class="object-cover m-auto h-56 " v-else  :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
+                  <video class="object-cover m-auto h-4/5" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
+                    <video class="object-cover m-auto h-4/5 " v-else   :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
+                <h1>{{user.name}}</h1>
             </div>
             <div  class="flex">
                 <!-- <p>my video</p> -->
                 <video
-                :class="userCheck?'m-auto max-w-56 h-56 object-cover':'object-cover m-auto h-96'"
+                :class="userCheck?'m-auto  h-4/5 object-cover':'object-cover m-auto  w-3/5'"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
                 <!-- <img :class="userCheck?`m-auto rounded-full object-cover h-64`:'m-auto rounded-full h-96'" v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/> -->
             </div>
        </div>
-      <!-- <div v-if="SharedScreen"> 
-      </div> -->
-          <video v-if="SharedScreen" class="m-auto max-w-56 h-56 object-cover" ref="SharedScreen" autoplay></video>
+
+
 
         <video-set :show="show" :stream="streamPermision" @close="close"/>
        <div class="w-1/4 bg-red-400">
           <message-container :messages="messages" @messageSend="messageSend"/>
-         <div>
-          <button
+       </div>
+    </div >
+    <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
+        <button
         @click="closeVideo"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          {{ activeVideo?'비디오 끄기':'비디오 켜기' }}</button>
@@ -34,9 +49,8 @@
           @click="closeAudio"
           class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          {{ activeVideo?'음소거':'오디오 키기' }}</button>
-         </div>
-       </div>
     </div>
+
 
 
 
@@ -108,22 +122,21 @@ export default {
               data:content})
     },
     async start(){
-      // this.stream=null;
           const vm=this
-            await navigator.mediaDevices.getDisplayMedia({
-            // audio: true,
+          this.SharedScreen=true
+          await navigator.mediaDevices.getDisplayMedia({
             video: true
           }).then(function(stream){
-               const videoHere = vm.$refs['video-here'];
+               const videoHere = vm.$refs['SharedScreen'];
+               console.log(videoHere)
                videoHere.srcObject =stream
-               console.log(stream)
               for(let i=0;i<vm.users.length;i++){
                 vm.getPeer(vm.users[i].id,vm.users[i].name,true,stream,'SharedScreen')
             }
-
           }).catch(function(e){
               console.log(e)
           });
+          this.videoCom();
     //  document.documentElement.requestFullscreen()
 
     },
@@ -142,6 +155,14 @@ export default {
       .then(res=>{
         console.log(res.data)
       } )
+    },
+    videoCom(){
+        for(let i=0;i<this.users.length;i++){
+            if(this.users[i].stream){
+               const videoThere = this.$refs[this.users[i].name];
+               videoThere.srcObject = this.users[i].stream;
+            }
+        }
     }
     ,
     getPeer(userId,userName, initiator,stream=this.stream,myName=this.user.name) {
@@ -160,10 +181,19 @@ export default {
 
         })
         .on('stream', (stream) => {
-          console.log(userName)
-          const videoThere = this.$refs[userName];
-          videoThere.srcObject = stream;
-          console.log(videoThere)
+          console.log('스트림 받아옴')
+        //   this.users[userId].stream=stream;
+
+        for(let i=0;i<this.users.length;i++){
+            if(this.users[i].id==userId){
+                this.users[i].stream=stream;
+            }
+        }
+        this.videoCom()
+
+        //   const videoThere = this.$refs[userName];
+        //   videoThere.srcObject = stream;
+        //   console.log(videoThere)
         })
         .on('close', () => {
           const peer = this.peers[userId];
@@ -179,10 +209,10 @@ export default {
     },
     close(permision){
         this.show=false;
-      
+
         const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.streamPermision;
-       
+
 
         if(!permision){
               this.closeVideo()
@@ -191,8 +221,8 @@ export default {
             this.activeVideo=true
           }
        this.peerConnetion()
-        
-        
+
+
     },
     closeVideo(){
        const vm=this
@@ -218,8 +248,8 @@ export default {
       try{
         let streamPermision = await navigator.mediaDevices.getUserMedia({video:true,audio: true  });
         if(streamPermision){
-          this.stream=this.streamPermision
           this.streamPermision=streamPermision
+          this.stream=this.streamPermision
           this.show=true
         }
         else{
@@ -243,13 +273,14 @@ export default {
     peerConnetion(){
       console.log('자신의 음성은 인식안됨')
       for(let i=0;i<this.users.length;i++){
+
                 this.getPeer(this.users[i].id,this.users[i].name,true)
             }
     }
     ,
     async setupVideoChat() {
-      
-     
+
+
     const vm=this
     this.channel=await window.Echo.join('presence-video-chat.'+this.roomId)
         .here((users) => {
@@ -280,9 +311,11 @@ export default {
       })
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
           const peer = this.getPeer(signal.userId,signal.userName ,false);
-          peer.signal(signal.data);
+          console.log(peer)
+         peer.signal(signal.data);
           if(signal.userName=='SharedScreen'){
             this.SharedScreen=true
+            
           }
            })
       .listenForWhisper('client-message-'+this.roomId,(message)=>{
