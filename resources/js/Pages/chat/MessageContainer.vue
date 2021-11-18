@@ -1,14 +1,14 @@
 <template>
         <div>
         <div class="h-48 overflow-y-scroll" ref="messagess">
-            <div class="container" v-for="message in messages" :key="message">
+            <div ref="container" class="container" v-for="message in messages" :key="message">
                 <!-- <img src="https://cdn1.iconfinder.com/data/icons/website-internet/48/website_-_male_user-512.png" style="width:100%;" /> -->
                 <p>{{message.data}}</p>
                 <!-- <span class="time-right">11:00</span> -->
             </div>
         </div>
-         <input type="text" v-model="content"/>
-                <button @click="send">send</button>
+         <input @keyup.enter="send" type="text" v-model="content"/>
+                <button  @click="send">send</button>
     </div>
 </template>
 
@@ -26,9 +26,15 @@ export default {
               send(){
                      this.$emit('messageSend',this.content)
                      this.content=null
-                      let messages = this.$refs.messagess;
-                      console.log(messages)
-              }
+                    
+                      this.scrollToEnd();
+              },
+              scrollToEnd: function() {    	
+                const messages = this.$refs.messagess;
+                messages.scrollTop = messages.scrollHeight;
+                // var container = this.$refs["container"];
+                console.log(messages.scrollHeight)
+                },
        }
        ,
        watch: {

@@ -120,6 +120,7 @@ export default {
              userId: this.user.id,
               userName:this.user.name,
               data:content})
+              
     },
     async start(){
          console.log(this.SharedScreen)
@@ -129,8 +130,6 @@ export default {
           await navigator.mediaDevices.getDisplayMedia({
             video: true
           }).then(function(stream){
-            //    const videoHere = vm.$refs['SharedScreen'];
-            //    videoHere.srcObject =stream
             vm.SharedStream=stream
               for(let i=0;i<vm.users.length;i++){
                 vm.getPeer(vm.users[i].id,'SharedScreen',true,stream,'SharedScreen')
@@ -178,7 +177,7 @@ export default {
         const share= this.$refs['SharedScreen']
         // console.log(videoThere)
         share.srcObject=this.SharedStream
-        console.log(this.SharedStream)
+        console.log(share)
 
       }
         for(let i=0;i<this.users.length;i++){
@@ -225,11 +224,12 @@ export default {
         }
         this.videoCom()
 
-        //   const videoThere = this.$refs[userName];
-        //   videoThere.srcObject = stream;
-        //   console.log(videoThere)
         })
         .on('close', () => {
+          if(userName=='SharedScreen'){
+            this.SharedScreen=false
+
+          }
           const peer = this.peers[userId+userName];
           if(peer !== undefined) {
             peer.destroy();
