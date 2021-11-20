@@ -11,6 +11,12 @@
               <video  class="object-cover m-auto w-1/5 " v-else  :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
                 <h1>{{user.name}}</h1>
             </div>
+             <div class="flex">
+               <video
+                class="object-cover m-auto w-1/5"
+                :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
+                ref="video-here" autoplay></video>
+             </div>
          </div>
          <div>
              <video class="m-auto h-2/5 object-cover mb-20" ref="SharedScreen" autoplay></video>
@@ -19,7 +25,7 @@
 
       <div v-else  :class="userCheck?'w-3/4 bg-blue-500 grid  grid-cols-2 gap-4 p-3':'w-3/4 bg-red-500'" ref="main">
             <div class="flex" v-for="user in users" :key="user.id">
-                  <video class="object-cover m-auto h-4/5" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
+                  <video class="object-cover m-auto h-4/5" v-if="user.image"   :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
                     <video class="object-cover m-auto h-4/5 " v-else   :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
                 <h1>{{user.name}}</h1>
             </div>
@@ -124,7 +130,7 @@ export default {
              userId: this.user.id,
               userName:this.user.name,
               data:content})
-              
+
     },
     async start(){
          console.log(this.SharedScreen)
@@ -195,20 +201,18 @@ export default {
         console.log(share)
 
       }
-        // for(let i=0;i<this.users.length;i++){
-        //     //   console.log(this.users[i])
-        //     if(this.users[i].stream){
-        //        const videoThere = this.$refs[this.users[i].name];
-        //        videoThere.srcObject = this.users[i].stream;
-        //     //    console.log(videoThere)
-        //     }
-        // }
+      if(this.activeVideo){
+        const videoHere = this.$refs['video-here'];
+        videoHere.srcObject = this.stream;
+      }
+
         for(let key in this.users){
           const user=this.users[key]
+          // console.log(user)
            if(user.stream){
                const videoThere = this.$refs[user.name];
                videoThere.srcObject = user.stream;
-            //    console.log(videoThere)
+               console.log(videoThere)
             }
         }
     }
@@ -230,19 +234,12 @@ export default {
         })
         .on('stream', (stream) => {
           console.log('스트림 받아옴')
-        
+
 
         if(userName=='SharedScreen'){
             this.SharedStream=stream
         }
         else{
-         
-        //   for(let i=0;i<this.users.length;i++){
-        //     if(this.users[i].id==userId){
-        //         this.users[i].stream=stream;
-        //         console.log(this.users[i])
-        //     }
-        // }
         for(let key in this.users){
           const user=this.users[key]
           if(user.id==userId){
@@ -256,9 +253,12 @@ export default {
 
         })
         .on('close', () => {
+          const vm=this
           if(userName=='SharedScreen'){
+            console.log('공유중지')
             this.SharedScreen=false
-
+            setTimeout(function() {
+            vm.videoCom()}, 300);
           }
           const peer = this.peers[userId+userName];
           if(peer !== undefined) {
@@ -274,14 +274,12 @@ export default {
     close(permision){
         this.show=false;
 
-        const videoHere = this.$refs['video-here'];
-        videoHere.srcObject = this.streamPermision;
-
-
         if(!permision){
               this.closeVideo()
           }
           else{
+             const videoHere = this.$refs['video-here'];
+        videoHere.srcObject = this.streamPermision;
             this.activeVideo=true
           }
        this.peerConnetion()
@@ -339,9 +337,6 @@ export default {
       }
     },
     peerConnetion(){
-      // for(let i=0;i<this.users.length;i++){
-      //           this.getPeer(this.users[i].id,this.users[i].name,true)
-      //       }
       for(let key in this.users){
         const user=this.users[key]
           this.getPeer(user.id,user.name,true)
