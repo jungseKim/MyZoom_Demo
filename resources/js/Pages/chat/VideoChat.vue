@@ -1,41 +1,55 @@
 <template>
-<app-layout title="s">
+<!-- <app-layout title="s"> -->
   <!-- <div class="container"> -->
     <h1 class="text-center">Laravel Video Chat</h1>
-    <div class="w-full flex flex-rows bg-gray-800">
+    <div class="w-full flex flex-rows p-10">
 
-      <div v-if="SharedScreen">
+      <div v-if="SharedScreen" class="h-3/5">
          <div class="flex flex-rows space-x-2 h-1/5">
               <div class="flex" v-for="user in users" :key="user.id">
-              <video class="object-cover m-auto w-1/5" v-if="user.image"  :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
-              <video  class="object-cover m-auto w-1/5 " v-else  :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
-                <h1>{{user.name}}</h1>
+              <video class="object-cover m-auto w-1/3"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
+               <div class="flex justify-between p-7 " >
+                <div></div>
+                <h1 class=" font-bold text-lg" >{{user.name}}</h1>
+                <i v-if="!user.activeOudio" class="fas fa-microphone-slash "></i>
+                <i v-else class="fas fa-microphone"></i>
+                </div>
             </div>
              <div class="flex">
                <video
-                class="object-cover m-auto w-1/5"
+                class="object-cover m-auto w-1/3"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
              </div>
          </div>
-         <div>
-             <video class="m-auto h-2/5 object-cover mb-20" ref="SharedScreen" autoplay></video>
+         <div class="p-5">
+             <video class="m-auto w-4/5  object-cover mb-20" ref="SharedScreen" autoplay></video>
          </div>
       </div>
 
       <div v-else  :class="userCheck?'w-3/4 bg-blue-500 grid  grid-cols-2 gap-4 p-3':'w-3/4 bg-red-500'" ref="main">
-            <div class="flex" v-for="user in users" :key="user.id">
-                  <video class="object-cover m-auto h-4/5" v-if="user.image"   :ref="user.name" autoplay :poster='`/storage/${user.image}`' :alt="user.name"></video>
-                    <video class="object-cover m-auto h-4/5 " v-else   :ref="user.name" autoplay poster='/noimage.jpg'  :alt="user.name"></video>
-                <h1>{{user.name}}</h1>
+            <div class="flex flex-col" v-for="user in users" :key="user.id">
+                  <video class="object-cover m-auto h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
+                <div class="flex justify-between p-7 " >
+                <div></div>
+                <h1 class=" font-bold text-2xlg" >{{user.name}}</h1>
+                <i v-if="!user.activeOudio" class="fas fa-microphone-slash fa-2x"></i>
+                <i v-else class="fas fa-microphone fa-2x"></i>
+                </div>
+                <!-- <div v-if="user.audioActive">트루</div> -->
             </div>
-            <div  class="flex">
+            <div  class="flex flex-col">
                 <!-- <p>my video</p> -->
                 <video
                 :class="userCheck?'m-auto  h-4/5 object-cover':'object-cover m-auto  h-3/5'"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
-                <!-- <img :class="userCheck?`m-auto rounded-full object-cover h-64`:'m-auto rounded-full h-96'" v-else :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"/> -->
+                 <div class="flex justify-between p-7 " >
+                <div></div>
+                <h1 class=" font-bold text-2xlg" >my video</h1>
+                <i v-if="!activeOudio" class="fas fa-microphone-slash fa-2x"></i>
+                <i v-else class="fas fa-microphone fa-2x"></i>
+                </div>
             </div>
        </div>
 
@@ -43,7 +57,7 @@
 
         <video-set :show="show" :stream="streamPermision" @close="close"/>
        <div class="w-1/4 bg-red-400">
-          <message-container :messages="messages" @messageSend="messageSend"/>
+          <message-container ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend"/>
        </div>
     </div >
     <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
@@ -63,7 +77,7 @@
 
 
 
-</app-layout>
+<!-- </app-layout> -->
 </template>
 <script>
 import Peer from 'simple-peer';
@@ -111,11 +125,6 @@ export default {
         return true
       }
       return false
-      // if(this.users.length>0){
-      //   return true
-      // }else{
-      //   return false
-      // }
     }
   },
   methods: {
@@ -124,14 +133,23 @@ export default {
         this.channel.whisper('client-message-'+this.roomId, {
               userId: this.user.id,
               userName:this.user.name,
+              image:this.$page.props.user.profile_photo_url,
               data:content
            });
         this.messages.push({
              userId: this.user.id,
               userName:this.user.name,
               data:content})
-
+          this.messageScroll()
     },
+    messageScroll(){
+      const vm=this
+      setTimeout(function() {
+      const messages=vm.$refs.messages
+    messages.scrollToEnd()
+    }, 300);
+    }
+    ,
     async start(){
          console.log(this.SharedScreen)
           const vm=this
@@ -146,10 +164,6 @@ export default {
                const user=vm.users[key]
               vm.getPeer(user.id,'SharedScreen',true,stream,'SharedScreen')
              }
-            //   for(let i=0;i<vm.users.length;i++){
-            //     vm.getPeer(vm.users[i].id,'SharedScreen',true,stream,'SharedScreen')
-            // }
-
           }).catch(function(e){
               console.log(e)
           });
@@ -165,12 +179,6 @@ export default {
               this.peers[user.id+'SharedScreen'].destroy()
             delete this.peers[user.id+'SharedScreen'];
              }
-
-        //     for(let i=0;i<this.users.length;i++){
-        //     this.peers[this.users[i].id+'SharedScreen'].destroy()
-        //     delete this.peers[this.users[i].id+'SharedScreen']
-        // }
-
           }
           this.videoCom();
     //  document.documentElement.requestFullscreen()
@@ -228,14 +236,13 @@ export default {
           this.channel.whisper(`client-signal-${userId}`, {
             userId: this.user.id,
             userName:myName,
-            data: data
+            data: data,
+            activeOudio:this.activeOudio
           });
 
         })
         .on('stream', (stream) => {
-          console.log('스트림 받아옴')
-
-
+          
         if(userName=='SharedScreen'){
             this.SharedStream=stream
         }
@@ -301,8 +308,17 @@ export default {
             if(track.kind=='audio'){
                 track.enabled=!track.enabled
                 vm.activeOudio=track.enabled
+
+                vm.channel.whisper('client-media-'+vm.roomId, {
+                userId: vm.user.id,
+                activeOudio:vm.activeOudio 
+           });
+
+
                 }
             });
+         
+            
     }
 
     ,
@@ -322,8 +338,8 @@ export default {
       catch(err){
          try{
            this.streamPermision = await navigator.mediaDevices.getUserMedia({audio: true  });
-          if(streamPermision){
-            this.stream = streamPermision;
+          if(this.streamPermision){
+            this.stream = this.streamPermision;
             this.peerConnetion()
             }
             else{
@@ -353,8 +369,6 @@ export default {
                 if(this.user.id!=users[i].id){
                     console.log(users[i])
                     this.users[users[i].id]=users[i]
-                    // this.users.push(users[i])
-                    //  this.getPeer(users[i].id,users[i].name,true)
                 }
             }
           }
@@ -376,7 +390,8 @@ export default {
           delete this.peers[user.id+user.name];
       })
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
-          console.log(signal)
+          this.users[signal.userId].activeOudio=signal.activeOudio
+        
         if(signal.userName=='SharedScreen'){
             this.SharedScreen=true
             const peer = this.getPeer(signal.userId,'SharedScreen' ,false,null,'SharedScreen');
@@ -390,7 +405,12 @@ export default {
       .listenForWhisper('client-message-'+this.roomId,(message)=>{
                      console.log(message)
                      this.messages.push(message)
-              });
+                      this.messageScroll()
+              })
+        .listenForWhisper('client-media-'+this.roomId,(data)=>{
+              console.log(data)
+               this.users[data.userId].activeOudio=data.activeOudio
+        });
       // this.showVideo()
     },
   }
