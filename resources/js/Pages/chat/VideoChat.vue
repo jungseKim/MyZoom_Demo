@@ -1,12 +1,11 @@
 <template>
 <!-- <app-layout title="s"> -->
   <!-- <div class="container"> -->
-    <h1 class="text-center">Laravel Video Chat</h1>
     <div class="w-full flex flex-rows p-10">
 
       <div v-if="SharedScreen" class="h-3/5">
          <div class="flex flex-rows space-x-2 h-1/5">
-              <div class="flex" v-for="user in users" :key="user.id">
+              <div class="flex flex-col" v-for="user in users" :key="user.id">
               <video class="object-cover m-auto w-1/3"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-between p-7 " >
                 <div></div>
@@ -15,11 +14,17 @@
                 <i v-else class="fas fa-microphone"></i>
                 </div>
             </div>
-             <div class="flex">
+             <div class="flex flex-col">
                <video
                 class="object-cover m-auto w-1/3"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
+                <div class="flex justify-between p-7 " >
+                <div></div>
+                <h1 class=" font-bold text-lg" >my video</h1>
+                <i v-if="!user.activeOudio" class="fas fa-microphone-slash "></i>
+                <i v-else class="fas fa-microphone"></i>
+                </div>
              </div>
          </div>
          <div class="p-5">
@@ -164,6 +169,14 @@ export default {
                const user=vm.users[key]
               vm.getPeer(user.id,'SharedScreen',true,stream,'SharedScreen')
              }
+          // stream.getTracks().forEach(function(track) {
+          //   if(track.kind=='video'){
+          //       // vm.stream.addTrack(track)
+          //       vm.peers['1kims'].addTrack(track)
+          //       }
+          //   });
+
+
           }).catch(function(e){
               console.log(e)
           });
@@ -242,7 +255,7 @@ export default {
 
         })
         .on('stream', (stream) => {
-          
+
         if(userName=='SharedScreen'){
             this.SharedStream=stream
         }
@@ -311,14 +324,14 @@ export default {
 
                 vm.channel.whisper('client-media-'+vm.roomId, {
                 userId: vm.user.id,
-                activeOudio:vm.activeOudio 
+                activeOudio:vm.activeOudio
            });
 
 
                 }
             });
-         
-            
+
+
     }
 
     ,
@@ -343,6 +356,7 @@ export default {
             this.peerConnetion()
             }
             else{
+              
               this.stream=null
                this.peerConnetion()
             }
@@ -391,7 +405,7 @@ export default {
       })
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
           this.users[signal.userId].activeOudio=signal.activeOudio
-        
+
         if(signal.userName=='SharedScreen'){
             this.SharedScreen=true
             const peer = this.getPeer(signal.userId,'SharedScreen' ,false,null,'SharedScreen');
