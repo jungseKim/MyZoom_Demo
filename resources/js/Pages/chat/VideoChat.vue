@@ -244,7 +244,7 @@ export default {
         .on('stream', (stream) => {
           
         if(userName=='SharedScreen'){
-            console.log(stream)
+            console.log("ddkdkdkd")
             this.SharedStream=stream
             console.log(this.SharedStream)
         }
@@ -269,10 +269,10 @@ export default {
             setTimeout(function() {
             vm.videoCom()}, 300);
           }
-          const peer = this.peers[userId+userName];
-          if(peer !== undefined) {
-            peer.destroy();
-          }
+          // const peer = this.peers[userId+userName];
+          // if(peer !== undefined) {
+          //   peer.destroy();
+          // }
           console.log('피어 쪽닫힘')
           delete this.peers[userId+userName];
         });
@@ -380,9 +380,14 @@ export default {
       })
       .joining((user) => {
           // this.users.push(user)
+          const vm=this
           this.users[user.id]=user
           if(this.SharedStream && this.isManager){
-            vm.getPeer(user.id,'SharedScreen',true,this.SharedStream,'SharedScreen')
+           setTimeout(function() {
+            vm.getPeer(user.id,'SharedScreen',true,vm.SharedStream,'SharedScreen')
+            }, 3000);
+          
+           
           }
      })
       .leaving((user) => {
