@@ -1,12 +1,12 @@
 <template>
-<!-- <app-layout title="s"> -->
+<app-layout title="s">
   <!-- <div class="container"> -->
     <h1 class="text-center">Laravel Video Chat</h1>
     <div class="w-full flex flex-rows p-10">
 
       <div v-if="SharedScreen" class="h-3/5">
          <div class="flex flex-rows space-x-2 h-1/5">
-              <div class="flex" v-for="user in users" :key="user.id">
+              <div class="flex flex-col" v-for="user in users" :key="user.id">
               <video class="object-cover m-auto w-1/3"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-between p-7 " >
                 <div></div>
@@ -57,7 +57,7 @@
 
         <video-set :show="show" :stream="streamPermision" @close="close"/>
        <div class="w-1/4 bg-red-400">
-          <message-container ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend"/>
+          <message-container ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend" />
        </div>
     </div >
     <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
@@ -77,7 +77,7 @@
 
 
 
-<!-- </app-layout> -->
+</app-layout>
 </template>
 <script>
 import Peer from 'simple-peer';
@@ -86,6 +86,7 @@ import axios from 'axios'
 import MessageContainer from './MessageContainer.vue';
 import Button from '../../Jetstream/Button.vue';
 import VideoSet from './VideoSet.vue'
+import { Inertia } from '@inertiajs/inertia'
 export default {
   props: ['user','roomId','isManager'],
   data() {
@@ -109,7 +110,10 @@ export default {
       Button,
       VideoSet
     },
-
+  created(){
+    Inertia.reload()
+  }
+  ,
   beforeUnmount(){
       this.RoomOut();
     window.Echo.leave('presence-video-chat.'+this.roomId);
@@ -151,15 +155,13 @@ export default {
     }
     ,
     async start(){
-         console.log(this.SharedScreen)
           const vm=this
           if(!this.SharedScreen){
-              this.SharedScreen=true
           await navigator.mediaDevices.getDisplayMedia({
             video: true
           }).then(function(stream){
+             vm.SharedScreen=true
             vm.SharedStream=stream
-
              for(let key in vm.users){
                const user=vm.users[key]
               vm.getPeer(user.id,'SharedScreen',true,stream,'SharedScreen')
@@ -168,12 +170,11 @@ export default {
               console.log(e)
           });
           }else{
-
               this.SharedScreen=false
               this.SharedStream.getTracks().forEach(function(track) {
                 track.stop();
                 });
-
+              this.SharedStream=null
             for(let key in this.users){
                const user=this.users[key]
               this.peers[user.id+'SharedScreen'].destroy()
@@ -204,12 +205,11 @@ export default {
     videoCom(){
       if(this.SharedScreen){
         const share= this.$refs['SharedScreen']
-        // console.log(videoThere)
         share.srcObject=this.SharedStream
         console.log(share)
 
       }
-      if(this.activeVideo){
+      if(this.activeVideo && this.stream){
         const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.stream;
       }
@@ -244,7 +244,9 @@ export default {
         .on('stream', (stream) => {
           
         if(userName=='SharedScreen'){
+            console.log(stream)
             this.SharedStream=stream
+            console.log(this.SharedStream)
         }
         else{
         for(let key in this.users){
@@ -261,7 +263,7 @@ export default {
         })
         .on('close', () => {
           const vm=this
-          if(userName=='SharedScreen'){
+          if(userName=='SharedScreen' && !this.isManager){
             console.log('공유중지')
             this.SharedScreen=false
             setTimeout(function() {
@@ -343,10 +345,12 @@ export default {
             this.peerConnetion()
             }
             else{
+              this.activeOudio=false
               this.stream=null
                this.peerConnetion()
             }
          }catch(err){
+            this.activeOudio=false
            this.peerConnetion()
 
          }
@@ -377,16 +381,26 @@ export default {
       .joining((user) => {
           // this.users.push(user)
           this.users[user.id]=user
-          console.log("evnet !!!!!!!!!")
+          if(this.SharedStream && this.isManager){
+            vm.getPeer(user.id,'SharedScreen',true,this.SharedStream,'SharedScreen')
+          }
      })
       .leaving((user) => {
           // this.users.splice(this.users.indexOf(user), 1);
           delete this.users[user.id]
-        const peer = this.peers[user.id+user.name];
+        if (this.isManager){
+          const peer = this.peers[user.id+'SharedScreen'];
+             if(peer !== undefined) {
+               peer.destroy();
+          }
+            delete this.peers[user.id+'SharedScreen'];
+        }
+          const peer = this.peers[user.id+user.name];
         if(peer !== undefined) {
             peer.destroy();
           }
           console.log('유저 나감')
+          
           delete this.peers[user.id+user.name];
       })
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
