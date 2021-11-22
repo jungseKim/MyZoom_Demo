@@ -23,7 +23,7 @@
              </div>
          </div>
          <div class="p-5">
-             <video class="m-auto w-4/5  object-cover mb-20" ref="SharedScreen" autoplay></video>
+             <video class="m-auto w-4/5  object-cover mb-20" ref="SharedScreen" autoplay muted></video>
          </div>
       </div>
 
@@ -61,7 +61,8 @@
        </div>
     </div >
     <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
-        <button
+        <button 
+        v-if="isManager"
         @click="start"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          화면 공유</button>
@@ -101,7 +102,7 @@ export default {
       activeVideo:true,
       activeOudio:true,
       SharedScreen:false,
-      SharedStream:null
+      SharedStream:null,
     }
   },
    components:{
@@ -109,18 +110,17 @@ export default {
       MessageContainer,
       Button,
       VideoSet
-    },
-  created(){
-    Inertia.reload()
-  }
+    }
   ,
   beforeUnmount(){
       this.RoomOut();
-    window.Echo.leave('presence-video-chat.'+this.roomId);
+    
 
   },
   mounted() {
     this.setupVideoChat()
+
+    window.addEventListener('beforeunload', this.RoomOut)
   }
   ,
   computed:{
@@ -186,6 +186,7 @@ export default {
 
     },
     RoomOut(){
+      window.Echo.leave('presence-video-chat.'+this.roomId);
    if(this.stream){
       this.stream.getTracks().forEach(function(track) {
     track.stop();
@@ -195,18 +196,26 @@ export default {
     for (let key in this.peers) {
                 const p = this.peers[key]
                 p.destroy()
-
+                delete this.peers[key]
                 }
      axios.delete('/chat/'+this.roomId+'/room')
       .then(res=>{
         console.log(res.data)
       } )
     },
-    videoCom(){
-      if(this.SharedScreen){
+    videoCom(check){
+      if(this.SharedScreen ){
+        console.log('zzz')
         const share= this.$refs['SharedScreen']
-        share.srcObject=this.SharedStream
-        console.log(share)
+        if(!share.srcObject){
+          share.srcObject=this.SharedStream
+          share.muted = true;
+          share.play()
+  //          share.onloadedmetadata = function(e) {
+  //   share.play();
+  // };
+        }
+        console.log(share.srcObject)
 
       }
       if(this.activeVideo && this.stream){
@@ -247,6 +256,7 @@ export default {
             console.log("ddkdkdkd")
             this.SharedStream=stream
             console.log(this.SharedStream)
+            this.videoCom(true)
         }
         else{
         for(let key in this.users){
@@ -256,9 +266,9 @@ export default {
                 console.log(user)
             }
         }
-
+this.videoCom(false)
         }
-        this.videoCom()
+        
 
         })
         .on('close', () => {
@@ -280,6 +290,7 @@ export default {
       }
       return this.peers[userId+userName];
     },
+    
     close(permision){
         this.show=false;
 
@@ -306,7 +317,8 @@ export default {
     },
     closeAudio(){
       const vm=this
-         this.stream.getTracks().forEach(function(track) {
+     try{
+           this.stream.getTracks().forEach(function(track) {
             if(track.kind=='audio'){
                 track.enabled=!track.enabled
                 vm.activeOudio=track.enabled
@@ -315,10 +327,12 @@ export default {
                 userId: vm.user.id,
                 activeOudio:vm.activeOudio 
            });
-
-
                 }
             });
+     }
+     catch(err){
+       alert('오디오가 없음')
+     }
          
             
     }
@@ -338,6 +352,7 @@ export default {
         }
       }
       catch(err){
+        this.activeVideo=false
          try{
            this.streamPermision = await navigator.mediaDevices.getUserMedia({audio: true  });
           if(this.streamPermision){
@@ -385,7 +400,8 @@ export default {
           if(this.SharedStream && this.isManager){
            setTimeout(function() {
             vm.getPeer(user.id,'SharedScreen',true,vm.SharedStream,'SharedScreen')
-            }, 3000);
+            
+            }, 300);
           
            
           }
