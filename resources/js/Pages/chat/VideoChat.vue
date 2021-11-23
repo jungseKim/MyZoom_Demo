@@ -6,20 +6,26 @@
 
       <div v-if="SharedScreen" class="h-3/5">
          <div class="flex flex-rows space-x-2 h-1/5">
-              <div class="flex flex-col" v-for="user in users" :key="user.id">
-              <video class="object-cover m-auto w-1/3"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
-               <div class="flex justify-between p-7 " >
+              <div class="relative " v-for="user in users" :key="user.id">
+              <video class="object-cover m-auto  z-0"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
+               <div class="flex justify-center " >
                 <div></div>
                 <h1 class=" font-bold text-lg" >{{user.name}}</h1>
                 <i v-if="!user.activeOudio" class="fas fa-microphone-slash "></i>
                 <i v-else class="fas fa-microphone"></i>
                 </div>
             </div>
-             <div class="flex">
+             <div class="relative">
                <video
-                class="object-cover m-auto w-1/3"
+                class="object-cover m-auto  z-0"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
+                 <div class="flex  justify-center" >
+                <div></div>
+                <h1 class=" font-bold text-lg" >my video</h1>
+                <i v-if="!activeOudio" class="fas fa-microphone-slash"></i>
+                <i v-else class="fas fa-microphone "></i>
+                </div>
              </div>
          </div>
          <div class="p-5">
@@ -41,7 +47,7 @@
             <div  class="flex flex-col">
                 <!-- <p>my video</p> -->
                 <video
-                :class="userCheck?'m-auto  h-4/5 object-cover':'object-cover m-auto  h-3/5'"
+                :class="userCheck?'m-auto  h-4/5 object-cover':'object-cover m-auto  h-2/5'"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
                  <div class="flex justify-between p-7 " >
@@ -52,12 +58,9 @@
                 </div>
             </div>
        </div>
-
-
-
         <video-set :show="show" :stream="streamPermision" @close="close"/>
-       <div class="w-1/4 bg-red-400">
-          <message-container ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend" />
+       <div class="w-1/6 bg-gray-200">
+          <message-container class="h-full " ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend" />
        </div>
     </div >
     <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
@@ -205,15 +208,11 @@ export default {
     },
     videoCom(check){
       if(this.SharedScreen ){
-        console.log('zzz')
         const share= this.$refs['SharedScreen']
         if(!share.srcObject){
           share.srcObject=this.SharedStream
           share.muted = true;
           share.play()
-  //          share.onloadedmetadata = function(e) {
-  //   share.play();
-  // };
         }
         console.log(share.srcObject)
 
@@ -259,32 +258,35 @@ export default {
             this.videoCom(true)
         }
         else{
-        for(let key in this.users){
-          const user=this.users[key]
-          if(user.id==userId){
-                user.stream=stream;
-                console.log(user)
-            }
+              for(let key in this.users){
+                const user=this.users[key]
+                if(user.id==userId){
+                      user.stream=stream;
+                      console.log(user)
+                  }
+              }
+        this.videoCom(false)
         }
-this.videoCom(false)
-        }
-        
-
-        })
+       })
         .on('close', () => {
           const vm=this
           if(userName=='SharedScreen' && !this.isManager){
             console.log('공유중지')
             this.SharedScreen=false
+            this.SharedStream=null
             setTimeout(function() {
             vm.videoCom()}, 300);
           }
           // const peer = this.peers[userId+userName];
+        
           // if(peer !== undefined) {
           //   peer.destroy();
           // }
           console.log('피어 쪽닫힘')
           delete this.peers[userId+userName];
+        })
+        .on('error', (err) => {
+          console.log(err.message)
         });
         this.peers[userId+userName] = peer;
       }
@@ -398,10 +400,7 @@ this.videoCom(false)
           const vm=this
           this.users[user.id]=user
           if(this.SharedStream && this.isManager){
-           setTimeout(function() {
-            vm.getPeer(user.id,'SharedScreen',true,vm.SharedStream,'SharedScreen')
-            
-            }, 300);
+             vm.getPeer(user.id,'SharedScreen',true,vm.SharedStream,'SharedScreen')
           
            
           }
@@ -410,16 +409,17 @@ this.videoCom(false)
           // this.users.splice(this.users.indexOf(user), 1);
           delete this.users[user.id]
         if (this.isManager){
-          const peer = this.peers[user.id+'SharedScreen'];
-             if(peer !== undefined) {
-               peer.destroy();
-          }
+          // const peer = this.peers[user.id+'SharedScreen'];
+          //    if(peer !== undefined) {
+          //      peer.destroy();
+          // }
             delete this.peers[user.id+'SharedScreen'];
         }
-          const peer = this.peers[user.id+user.name];
-        if(peer !== undefined) {
-            peer.destroy();
-          }
+          // const peer = this.peers[user.id+user.name];
+          //   peer.removeAllListeners('close')
+        // if(peer !== undefined) {
+        //     peer.destroy();
+        //   }
           console.log('유저 나감')
           
           delete this.peers[user.id+user.name];
@@ -446,7 +446,7 @@ this.videoCom(false)
               console.log(data)
                this.users[data.userId].activeOudio=data.activeOudio
         });
-      // this.showVideo()
+      
     },
   }
 };

@@ -1,6 +1,6 @@
 <template>
         <div>
-        <div class="h-48 overflow-y-scroll" ref="messagess">
+        <div class="h-96 overflow-y-scroll  scrollbar-hide" ref="messagess">
             <div ref="container" class="container" v-for="message in messages" :key="message">
                 <div id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
                 <div class="chat-message" v-if="message.userId != $page.props.user.id">
@@ -28,8 +28,19 @@
             </div>
             </div>
         </div>
-         <input @keyup.enter="send" type="text" v-model="content"/>
-                <button  @click="send">send</button>
+         <div class="flex w-full bg-white-400 ">
+             <div class="relative">
+           <input @keyup.enter="send"  type="text"  v-model="content"  class=" w-full pl-10 pr-20 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Let do chatting..">
+            <div class="absolute top-2 right-2">   <i class="fas fa-paper-plane fa-2x" @click="send"></i> </div>
+        </div>
+             <!-- <input class="w-3/4" @keyup.enter="send" type="text" v-model="content"/>
+
+               <div class="flex w-1/4 justify-center">
+              
+                   
+                </div>  -->
+         </div>
+                <!-- <button  @click="send">send</button> -->
     </div>
 </template>
 
