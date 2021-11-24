@@ -13,7 +13,7 @@ class VideoChatController extends Controller
     {
         $user = $request->user();
         if (Room::where('user_id', $user->id)->exists()) {
-            Room::where('user_id', $user->id)->delete();
+            // Room::where('user_id', $user->id)->delete();
         } else {
             room_user::where('user_id', $user->id)->delete();
         }

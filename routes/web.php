@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\VideoChatController;
+use App\Models\Group;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -42,4 +45,15 @@ Route::prefix('chat/')->group(function () {
 
     Route::get('{roomId}/room', [VideoChatController::class, 'room'])
         ->name('chat.room');
+});
+
+Route::prefix('group/')->group(function () {
+    Route::get('index', [GroupController::class, 'index'])
+        ->name('group.index');
+
+    Route::get('create', [GroupController::class, 'create'])
+        ->name('group.create');
+
+    Route::get('search', [GroupController::class, 'search'])
+        ->name('group.search');
 });

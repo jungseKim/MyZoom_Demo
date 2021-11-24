@@ -28,6 +28,9 @@
                                  <jet-nav-link :href="route('chat.create')" :active="route().current('chat.create')">
                                     make
                                 </jet-nav-link>
+                                  <jet-nav-link :href="route('group.index')" :active="route().current('group.index')">
+                                    my info
+                                </jet-nav-link>
                             </div>
                         </div>
 
