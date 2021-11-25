@@ -1,6 +1,6 @@
 <template>
        <group-layout>
-       <template v-slot:content>
+       <template #content>
         <main  class="relative z-0 flex-1 pb-8 px-6 bg-white">
               <div class="grid pb-10  mt-4 ">
                   <!-- Start Content-->

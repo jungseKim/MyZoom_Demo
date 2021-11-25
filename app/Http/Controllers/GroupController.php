@@ -21,12 +21,12 @@ class GroupController extends Controller
     }
     public function search(Request $request)
     {
-        // $user = DB::table('users')->where('name', $request->searchName)->first();
+        $user = User::where('name', $request->name)->first();
 
-        // if (!$user) {
-        //     return 404;
-        // }
-        return $request->searchName;
+        if (!$user) {
+            return 404;
+        }
+        return $user;
         // return view('posts.search', compact('posts', 'name'));
     }
 }
