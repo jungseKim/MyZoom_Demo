@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\VideoChatController;
 use App\Models\Group;
@@ -58,4 +59,13 @@ Route::prefix('group/')->group(function () {
         ->name('group.search');
 
     Route::post('store', [GroupController::class, 'store']);
+
+    Route::get('notice', [GroupController::class, 'notice'])
+        ->name('group.notice');
+});
+
+Route::prefix('notice/')->group(function () {
+
+    Route::get('index', [NoticeController::class, 'index'])
+        ->name('notice.index');
 });

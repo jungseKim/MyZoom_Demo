@@ -46,6 +46,7 @@ class GroupController extends Controller
         $gorup->title = $request->title;
         $gorup->introduction = $request->introduction;
         $gorup->save();
+
         if ($request->users) {
             $users = $request->users;
 

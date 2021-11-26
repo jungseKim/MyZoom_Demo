@@ -52,7 +52,7 @@
                   />
                 </svg>
               </span>
-              <a href="#">
+              <a :href="route('notice.index')" :active="route().current('notice.index')">
                
                 <span class="ml-2">notice</span>
               </a>

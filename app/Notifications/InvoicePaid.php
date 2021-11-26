@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Models\Group;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -12,6 +14,21 @@ class InvoicePaid extends Notification
 {
     use Queueable;
     public $datas;
+
+    public $with = ['group'];
+
+    public function offerGroup()
+    {
+        $id = $this->datas['offerGroup'];
+        return Group::find($id);
+    }
+
+
+    public function offerUser()
+    {
+        $id = $this->datas['offerUser'];
+        return User::find($id);
+    }
     /**
      * Create a new notification instance.
      *
@@ -65,8 +82,9 @@ class InvoicePaid extends Notification
     public function toArray($notifiable)
     {
         return [
-            'offerUser' => $this->datas['offerUser'],
-            'offerGroup' => $this->datas['offerGroup']
+            'offerUser' => $this->offerUser(),
+            'offerGroup' => $this->offerGroup()
+
         ];
     }
 }
