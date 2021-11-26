@@ -16,10 +16,10 @@ class CreateGroupUserTable extends Migration
         Schema::create('group_user', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('user_id')
+            $table->foreignId('gruop_id')
                 ->constrained()
                 ->onDelete('cascade');
-            $table->foreignId('gruop_id')
+            $table->foreignId('user_id')
                 ->constrained()
                 ->onDelete('cascade');
         });

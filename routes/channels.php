@@ -23,3 +23,7 @@ Broadcast::channel('presence-video-chat.{roomId}', function ($user, $roomId) {
         return ['id' => $user->id, 'name' => $user->name, 'image' => $user->profile_photo_path];
     }
 });
+
+// Broadcast::channel('App.User.{id}', function ($user, $roomId) {
+//     return true;
+// });

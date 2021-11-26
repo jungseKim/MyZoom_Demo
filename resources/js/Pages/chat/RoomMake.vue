@@ -62,8 +62,7 @@ export default {
                     Inertia.post('/chat/store',form,{
                         onError:(errors)=>this.errnow(errors)
                     })
-                    // form.post('room/store')
-                    // console.log(response)
+                 
              }
              ,
              errnow(err){

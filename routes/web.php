@@ -56,4 +56,6 @@ Route::prefix('group/')->group(function () {
 
     Route::get('search', [GroupController::class, 'search'])
         ->name('group.search');
+
+    Route::post('store', [GroupController::class, 'store']);
 });

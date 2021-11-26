@@ -28,7 +28,7 @@
                   ></path>
                 </svg>
               </span>
-              <a href="#">
+              <a :href="route('group.create')" :active="route().current('group.create')">
                 <span class="ml-2">Dashboard</span>
               </a>
             </li>
@@ -54,7 +54,7 @@
               </span>
               <a href="#">
                
-                <span class="ml-2">Customers</span>
+                <span class="ml-2">notice</span>
               </a>
             </li>
             <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
@@ -67,9 +67,9 @@
                   ></path>
                 </svg>
               </span>
-              <a href="#">
+              <a :href="route('group.create')" :active="route().current('group.create')">
                
-                <span class="ml-2">Milestones</span>
+                <span class="ml-2">Group Create</span>
               </a>
             </li>
             <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
@@ -133,8 +133,9 @@
       <slot name="content">
                 </slot>
        </div>
-
+      
 </div>
+
 
    
 </template>
@@ -144,6 +145,12 @@ import JetNavLink from '@/Jetstream/NavLink.vue'
 export default {
   components:{
     JetNavLink
+  },
+  mounted(){
+      Echo.private('App.Models.User.' + this.$page.props.user.id)
+    .notification((notification) => {
+        console.log(notification);
+    });
   }
 }
 </script>

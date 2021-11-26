@@ -16,8 +16,10 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory;
     use HasProfilePhoto;
     use Notifiable;
+
     use TwoFactorAuthenticatable;
 
+    protected $with = ['notification'];
     /**
      * The attributes that are mass assignable.
      *
@@ -28,7 +30,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
     ];
-
+    public function notification()
+    {
+        return $this->notifications();
+    }
+    // public function receivesBroadcastNotificationsOn()
+    // {
+    //     return 'users.' . $this->id;
+    // }
     /**
      * The attributes that should be hidden for serialization.
      *
