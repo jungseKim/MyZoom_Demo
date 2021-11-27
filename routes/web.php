@@ -60,12 +60,17 @@ Route::prefix('group/')->group(function () {
 
     Route::post('store', [GroupController::class, 'store']);
 
+    Route::post('userAdd', [GroupController::class, 'userAdd']);
+
     Route::get('notice', [GroupController::class, 'notice'])
         ->name('group.notice');
+
+    Route::get('show/{id}', [GroupController::class, 'show'])
+        ->name('group.show');
 });
 
-Route::prefix('notice/')->group(function () {
+// Route::prefix('notice/')->group(function () {
 
-    Route::get('index', [NoticeController::class, 'index'])
-        ->name('notice.index');
-});
+//     Route::get('index', [NoticeController::class, 'index'])
+//         ->name('notice.index');
+// });

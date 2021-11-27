@@ -56,7 +56,8 @@ class InvoicePaid extends Notification
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'message' => 'hellow'
+            'offerUser' => $this->offerUser(),
+            'offerGroup' => $this->offerGroup()
         ]);
     }
     /**

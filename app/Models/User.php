@@ -19,7 +19,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     use TwoFactorAuthenticatable;
 
-    protected $with = ['notification'];
+    protected $with = ['noticeNumber'];
     /**
      * The attributes that are mass assignable.
      *
@@ -30,9 +30,26 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
     ];
+
+    public function groups()
+    {
+        // return $this->hasMany(user_room::class);
+        return $this->belongsToMany(Group::class);
+    }
+
     public function notification()
     {
         return $this->notifications();
+    }
+    public function noticeNumber()
+    {
+        return $this->unreadNotifications();
+    }
+    public function Read()
+    {
+        foreach ($this->unreadNotifications as $notification) {
+            $notification->markAsRead();
+        }
     }
     // public function receivesBroadcastNotificationsOn()
     // {

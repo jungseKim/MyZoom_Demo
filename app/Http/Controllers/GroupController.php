@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\group_user;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,9 +13,16 @@ use App\Notifications\InvoicePaid;
 
 class GroupController extends Controller
 {
+    public function show($id)
+    {
+
+        return Inertia::render('group/GroupShow');
+    }
+
     public function index()
     {
-        return Inertia::render('group/GroupIndex');
+        $groups = auth()->user()->groups;
+        return Inertia::render('group/GroupIndex', ['groups' => $groups]);
     }
 
     public function create()
@@ -47,6 +55,13 @@ class GroupController extends Controller
         $gorup->introduction = $request->introduction;
         $gorup->save();
 
+        group_user::create(
+            [
+                'user_id' => $offer->id,
+                'group_id' => $gorup->id
+            ]
+        );
+
         if ($request->users) {
             $users = $request->users;
 
@@ -66,5 +81,26 @@ class GroupController extends Controller
         ];
         $user = User::find($userId);
         $user->notify(new InvoicePaid($datas));
+    }
+    public function userAdd(Request $request)
+    {
+        // $a = new group_user();
+        // $a->user_id = auth()->user()->id;
+        // $a->gruop_id = $request->groupId;
+        // $a->save();
+        group_user::create(
+            [
+                'user_id' => auth()->user()->id,
+                'group_id' => $request->groupId
+            ]
+        );
+    }
+    public function notice()
+    {
+        $id = auth()->user()->id;
+        $user = User::find($id);
+        $notification = $user->notification;
+        $user->Read();
+        return Inertia::render('group/Notification', ['notices' => $notification]);
     }
 }

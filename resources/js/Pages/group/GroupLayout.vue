@@ -1,20 +1,20 @@
 <template>
     <!-- component -->
 <div class="flex ">
-      <nav class="flex flex-col bg-purple-900 w-1/4 h-screen px-4 tex-gray-900 border border-purple-900">
+      <nav class="flex flex-col bg-purple-700 w-30 h-screen px-4 tex-gray-700 border border-purple-900">
         <div class="flex flex-wrap mt-8">
-          <div class="w-1/2">
+          <div class="w-1/2 mx-auto">
             <img
               :src="$page.props.user.profile_photo_url" :alt="$page.props.user.name"
               class="mx-auto w-20 h-20 rounded-full"
             />
           </div>
-          <div class="w-1/2">
-            <span class="font-semibold text-white">Ava Harper</span>
-            <button class="bg-green-500 text-white px-4 py-2 rounded-md border border-blue-500 hover:bg-white hover:text-green-500">
-              Premium
+          <!-- <div class="w-1/2">
+            <span class="font-semibold text-white">안읽은 알람</span>
+            <button class="bg-red-500 text-white px-4 py-2 rounded-md border border-blue-500 hover:bg-white hover:text-green-500">
+              {{$page.props.user.notice_number.length  }}
             </button>
-          </div>
+          </div> -->
         </div>
         <div class="mt-10 mb-4">
           <ul class="ml-4">
@@ -28,33 +28,23 @@
                   ></path>
                 </svg>
               </span>
-              <a :href="route('group.create')" :active="route().current('group.create')">
+              <a :href="route('group.index')" :active="route().current('group.index')">
                 <span class="ml-2">Dashboard</span>
               </a>
             </li>
+            <li v-if="$page.props.user.notice_number.length>0" class="mt-0">
+                <div class="flex">
+                  <span class="text-red-300 mx-auto">new  {{$page.props.user.notice_number.length}}</span>
+                </div>
+            </li>
             <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
+           
               <span>
-                <svg
-                  class="fill-current h-5 w-5 "
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7ZM14 7C14 8.10457 13.1046 9 12 9C10.8954 9 10 8.10457 10 7C10 5.89543 10.8954 5 12 5C13.1046 5 14 5.89543 14 7Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M16 15C16 14.4477 15.5523 14 15 14H9C8.44772 14 8 14.4477 8 15V21H6V15C6 13.3431 7.34315 12 9 12H15C16.6569 12 18 13.3431 18 15V21H16V15Z"
-                    fill="currentColor"
-                  />
-                </svg>
+                <i class="far fa-envelope"></i>
               </span>
-              <a :href="route('notice.index')" :active="route().current('notice.index')">
+              <a :href="route('group.notice')" :active="route().current('group.notice')">
                
-                <span class="ml-2">notice</span>
+                <span class="ml-2">Notification</span>
               </a>
             </li>
             <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
@@ -129,10 +119,55 @@
           </ul>
         </div>
       </nav>
-       <div class="w-3/4"> 
+      <!-- <section class="relative block w-full">
+    <img class="absolute top-0 w-full h-full bg-center bg-cover"
+    src="/background-2.jpg"/> -->
+    <!-- <div class="absolute top-0 w-full h-full bg-center bg-cover" >
+      <span id="blackOverlay" class="w-full h-full absolute opacity-50 bg-black"></span>
+    </div> -->
+    <!-- <div class="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden h-70-px" style="transform: translateZ(0px)">
+      <svg class="absolute bottom-0 overflow-hidden" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" version="1.1" viewBox="0 0 2560 100" x="0" y="0">
+        <polygon class="text-blueGray-200 fill-current" points="2560 0 2560 100 0 100"></polygon>
+      </svg>
+    </div> -->
+<div class="w-3/4"> 
+
       <slot name="content">
                 </slot>
-       </div>
+                </div>
+  <!-- </section> -->
+       
+       <jet-dialog-modal :show="showNotice" @close="showNotice = false">
+      
+
+        <template #content>
+               <div class="w-full mx-3 overflow-hidden bg-white border rounded md:w-12/12 md:mx-0 lg:mx-0">
+                <div class="flex justify-between w-full p-3">
+
+                    <span class="px-2 rounded cursor-pointer hover:bg-gray-300"></span>
+                    </div>
+                    <div class="px-3 pb-2">
+                    <div >
+                            <span class="font-bold text-lg">{{ showNotice.offerUser.name }}님으로 부터 메세지가 왔습니다</span>
+                      <!-- <span class="mr-1 font-black">{{showNotice.offerGroup.title}}</span> -->
+                    </div>
+                    <hr class="my-4">
+                    
+                
+                    </div>
+                </div>
+                       </template>
+
+                     <template #footer>
+                     <jet-secondary-button @click="confirm(true)" class="bg-green-300 w-1/5">
+                            보러가기
+                     </jet-secondary-button>
+
+                     <jet-secondary-button @click="confirm(false)" class="bg-red-300 w-1/5">
+                            닫기
+                     </jet-secondary-button>
+                     </template>
+              </jet-dialog-modal>
       
 </div>
 
@@ -142,15 +177,42 @@
 
 <script>
 import JetNavLink from '@/Jetstream/NavLink.vue'
+import JetDialogModal from '@/Jetstream/DialogModal.vue'
+import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
+
+import { Inertia } from '@inertiajs/inertia'
 export default {
   components:{
-    JetNavLink
+    JetNavLink,
+    JetDialogModal,
+    JetSecondaryButton
   },
+  data(){
+    return{
+      showNotice:false
+    }
+  }
+  ,
   mounted(){
       Echo.private('App.Models.User.' + this.$page.props.user.id)
     .notification((notification) => {
-        console.log(notification);
+      this.showNotice=notification
+        // console.log(notification);
     });
+  }
+  ,
+  methods:{
+     confirm(check){
+      if(check){
+        // this.$page.props.user.notice_number=0
+        Inertia.get('/group/notice')
+      }
+      else{
+        this.$page.props.user.notice_number.push('a')
+         this.showNotice=false;
+      }
+       
+    }
   }
 }
 </script>
