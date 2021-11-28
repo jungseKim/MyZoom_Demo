@@ -15,8 +15,7 @@ class GroupController extends Controller
 {
     public function show($id)
     {
-
-        return Inertia::render('group/GroupShow');
+        return Inertia::render('group/GroupShow', ['group' => Group::find($id)]);
     }
 
     public function index()

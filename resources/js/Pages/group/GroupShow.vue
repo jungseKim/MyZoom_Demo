@@ -2,88 +2,56 @@
 <group-layout>
        <template #content>
               
-  <section class=" py-16 bg-blueGray-200 m-auto">
-    <div class="container mx-auto px-4">
-      <div class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64">
-        <div class="px-6">
-          <div class="flex flex-wrap justify-center">
-            <div class="w-full lg:w-3/12 px-4 lg:order-2 flex justify-center">
-              <div class="relative">
-                <img alt="..." src="https://demos.creative-tim.com/notus-js/assets/img/team-2-800x800.jpg" class="shadow-xl rounded-full h-auto align-middle border-none absolute -m-16 -ml-20 lg:-ml-16 max-w-150-px">
-              </div>
-            </div>
-            <div class="w-full lg:w-4/12 px-4 lg:order-3 lg:text-right lg:self-center">
-              <div class="py-6 px-3 mt-32 sm:mt-0">
-                <button class="bg-pink-500 active:bg-pink-600 uppercase text-white font-bold hover:shadow-md shadow text-xs px-4 py-2 rounded outline-none focus:outline-none sm:mr-2 mb-1 ease-linear transition-all duration-150" type="button">
-                  Connect
-                </button>
-              </div>
-            </div>
-            <div class="w-full lg:w-4/12 px-4 lg:order-1">
-              <div class="flex justify-center py-4 lg:pt-4 pt-8">
-                <div class="mr-4 p-3 text-center">
-                  <span class="text-xl font-bold block uppercase tracking-wide text-blueGray-600">22</span><span class="text-sm text-blueGray-400">Friends</span>
-                </div>
-                <div class="mr-4 p-3 text-center">
-                  <span class="text-xl font-bold block uppercase tracking-wide text-blueGray-600">10</span><span class="text-sm text-blueGray-400">Photos</span>
-                </div>
-                <div class="lg:mr-4 p-3 text-center">
-                  <span class="text-xl font-bold block uppercase tracking-wide text-blueGray-600">89</span><span class="text-sm text-blueGray-400">Comments</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="text-center mt-12">
-            <h3 class="text-4xl font-semibold leading-normal mb-2 text-blueGray-700 mb-2">
-              Jenna Stones
-            </h3>
-            <div class="text-sm leading-normal mt-0 mb-2 text-blueGray-400 font-bold uppercase">
-              <i class="fas fa-map-marker-alt mr-2 text-lg text-blueGray-400"></i>
-              Los Angeles, California
-            </div>
-            <div class="mb-2 text-blueGray-600 mt-10">
-              <i class="fas fa-briefcase mr-2 text-lg text-blueGray-400"></i>Solution Manager - Creative Tim Officer
-            </div>
-            <div class="mb-2 text-blueGray-600">
-              <i class="fas fa-university mr-2 text-lg text-blueGray-400"></i>University of Computer Science
-            </div>
-          </div>
-          <div class="mt-10 py-10 border-t border-blueGray-200 text-center">
-            <div class="flex flex-wrap justify-center">
-              <div class="w-full lg:w-9/12 px-4">
-                <p class="mb-4 text-lg leading-relaxed text-blueGray-700">
-                  An artist of considerable range, Jenna the name taken by
-                  Melbourne-raised, Brooklyn-based Nick Murphy writes,
-                  performs and records all of his own music, giving it a
-                  warm, intimate feel with a solid groove structure. An
-                  artist of considerable range.
+   <div class="m-10">
+    <div class=" px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 bg-clip-padding bg-opacity-60 border border-gray-200" style="backdrop-filter: blur(20px);">
+     <div class="mx auto text-center border-2 rounded-full p-2 border-purple-100 bg-purple-100">
+        <span class="text-2xl text-base  font-extrabold">{{group.title}}의 그룹 </span>
+     </div>
+      <div class="max-w-md mx-auto">
+        
+        <div class="divide-y divide-gray-200">
+          <div class="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+            <div class="text-center"><p class="font-bold text-xl ">그룹원</p></div>
+            <ul class="list-disc space-y-2 divide-y-2 divide-border-black rounded-md  p-2  border-2  p-5">
+              <li v-for="user in group.users" :key="user.id" class="flex items-start">
+                <!-- <span class="h-6 flex items-center sm:h-7">
+                  <svg class="flex-shrink-0 h-5 w-5 text-cyan-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                </span> -->
+                <img :src="user.profile_photo_url" class="w-16 h-16 rounded-full">
+                <p class="m-auto text-2xl font-bold">
+                  {{ user.name }}
                 </p>
-                <a href="#pablo" class="font-normal text-pink-500">Show more</a>
-              </div>
-            </div>
+              </li>
+
+            </ul>
+           
           </div>
+          
         </div>
       </div>
-    </div>
-    <footer class="relative bg-blueGray-200 pt-8 pb-6 mt-8">
-  <div class="container mx-auto px-4">
-    <div class="flex flex-wrap items-center md:justify-between justify-center">
-      <div class="w-full md:w-6/12 px-4 mx-auto text-center">
-        <div class="text-sm text-blueGray-500 font-semibold py-1">
-          Made with <a href="https://www.creative-tim.com/product/notus-js" class="text-blueGray-500 hover:text-gray-800" target="_blank">Notus JS</a> by <a href="https://www.creative-tim.com" class="text-blueGray-500 hover:text-blueGray-800" target="_blank"> Creative Tim</a>.
-        </div>
-      </div>
+      <div class="pt-6 text-base leading-6 font-bold sm:text-lg sm:leading-7">
+            <!-- <p>See me on <a class="font-bold text-blue-700" href="https://www.linkedin.com/in/ferdianar/"> LinkedIn </a></p> -->
+            <div class="text-center"><p class="font-bold text-xl text-base ">소개말</p></div>
+           <div class="rounded-md  p-2  border-2  p-5  text-center">
+
+            <p class="text-cyan-600">
+                {{ group.introduction }}
+                </p>
+           </div>
+          </div>
+     
     </div>
   </div>
-</footer>
-  </section>
-</template>
+  </template>
 </group-layout>
 </template>
 <script>
 
 import GroupLayout from './GroupLayout.vue'
 export default {
+    props:['group'],
        components:{
               GroupLayout
        },

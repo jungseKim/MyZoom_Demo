@@ -2,8 +2,9 @@
 <group-layout>
                       <template #content>
                        
-    <div class="flex flex-col container  mt-10 mx-auto w-full items-center justify-center bg-white dark:bg-gray-800 rounded-lg shadow">
-       <h1 class="mx-auto bt-5 text-bold text-2xl"> 알림 목록</h1>
+  <div class="m-10">
+    <div class="text-center px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 bg-clip-padding bg-opacity-60 border border-gray-200" style="backdrop-filter: blur(20px);">
+       <h1 class="text-2xl text-base  font-extrabold"> 알림 목록</h1>
   <ul class="flex flex-col divide-y w-full p-5">
     <li class="flex flex-row" v-for="notice in notices" :key="notice.id" @click="showThisNotice(notice)">
       <div class="select-none cursor-pointer hover:bg-gray-50 flex flex-1 items-center p-4">
@@ -24,6 +25,7 @@
     </li>
   </ul>
 
+</div>
 </div>
 <jet-dialog-modal :show="showNotice" @close="showNotice = false">
         <template #title>

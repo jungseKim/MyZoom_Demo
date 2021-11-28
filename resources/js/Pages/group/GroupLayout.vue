@@ -130,8 +130,8 @@
         <polygon class="text-blueGray-200 fill-current" points="2560 0 2560 100 0 100"></polygon>
       </svg>
     </div> -->
-<div class="w-3/4"> 
-
+<!-- <div class="w-3/4">  -->
+<div class="bg-cover w-full" style="background-image: url('/background-2.jpg')">
       <slot name="content">
                 </slot>
                 </div>

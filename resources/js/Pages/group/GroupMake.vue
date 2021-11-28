@@ -1,7 +1,8 @@
 <template>
               <group-layout>
                      <template #content>
-          <div class="container flex-row	m-auto w-2/3 border-2">
+         <div class="m-10">
+    <div class=" px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 bg-clip-padding bg-opacity-60 border border-gray-200" style="backdrop-filter: blur(20px);">
             <label for="title" class="block text-sm font-medium text-gray-700">
                     그룹이름</label>
              <input id="title" class="w-full" type="text" v-model="title" ref="inputs">
@@ -56,6 +57,7 @@
                         </button>
                        
                      </div>
+    </div>
          </div>
 
          <jet-dialog-modal :show="searchUser" @close="searchUser = false">
