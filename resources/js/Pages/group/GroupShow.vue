@@ -41,7 +41,10 @@
                 </p>
            </div>
           </div>
-     
+        <div class="flex m-5 items-center space-x-10">
+         <button @click="nowSatrt" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">바로시작</button>
+           <button class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">예약하기</button>
+        </div>
     </div>
   </div>
   </template>
@@ -50,11 +53,18 @@
 <script>
 
 import GroupLayout from './GroupLayout.vue'
+import { Inertia } from '@inertiajs/inertia'
+
 export default {
     props:['group'],
        components:{
               GroupLayout
        },
+       methods:{
+          nowSatrt(){
+             Inertia.get('/group/video/'+this.group.id)
+          }
+       }
 
 }
 </script>

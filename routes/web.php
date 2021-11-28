@@ -67,6 +67,9 @@ Route::prefix('group/')->group(function () {
 
     Route::get('show/{id}', [GroupController::class, 'show'])
         ->name('group.show');
+
+    Route::get('video/{id}', [GroupController::class, 'video'])
+        ->name('group.video');
 });
 
 // Route::prefix('notice/')->group(function () {

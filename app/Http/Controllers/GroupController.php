@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\group_user;
+use App\Models\Room;
 use App\Models\User;
+use App\Notifications\GroupNotice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -81,6 +83,7 @@ class GroupController extends Controller
         $user = User::find($userId);
         $user->notify(new InvoicePaid($datas));
     }
+
     public function userAdd(Request $request)
     {
         // $a = new group_user();
@@ -101,5 +104,33 @@ class GroupController extends Controller
         $notification = $user->notification;
         $user->Read();
         return Inertia::render('group/Notification', ['notices' => $notification]);
+    }
+
+    public function video($id)
+    {
+        $user = auth()->user();
+        $gorup = Group::find($id);
+
+        $users = $gorup->users;
+        $datas = [
+            'offerUser' => 'offerId',
+            'offerGroup' => 'groupId'
+        ];
+        foreach ($users as $user) {
+            $user = User::find($user['id']);
+            $when = now()->addMinutes(1);
+            $user->notify(new GroupNotice($datas))->delay($when);
+        }
+
+
+        return Inertia::render('chat/VideoChat')->with([
+            // 'user' => collect($request->user()->only(['id', 'name'])),
+            'roomId' => $id,
+            'isManager' => $user->id == $gorup->user_id ? true : false
+
+        ]);
+    }
+    public function groupSend()
+    {
     }
 }
