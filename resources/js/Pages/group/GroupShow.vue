@@ -42,11 +42,12 @@
            </div>
           </div>
         <div class="flex m-5 items-center space-x-10">
-         <button @click="nowSatrt" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">바로시작</button>
-           <button class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">예약하기</button>
+         <button v-if="group.user_id==$page.props.user.id" @click="nowSatrt" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">바로시작</button>
+           <button @click="dataClick" v-if="group.user_id==$page.props.user.id" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">예약하기</button>
         </div>
     </div>
   </div>
+  <group-reservation :show="show" />
   </template>
 </group-layout>
 </template>
@@ -54,15 +55,25 @@
 
 import GroupLayout from './GroupLayout.vue'
 import { Inertia } from '@inertiajs/inertia'
-
+import GroupReservation from './GroupReservation.vue'
 export default {
     props:['group'],
        components:{
-              GroupLayout
+              GroupLayout,
+              GroupReservation
        },
+       data(){
+         return{
+           show:false
+         }
+       }
+       ,
        methods:{
           nowSatrt(){
              Inertia.get('/group/video/'+this.group.id)
+          },
+          dataClick(){
+            this.show=true;
           }
        }
 

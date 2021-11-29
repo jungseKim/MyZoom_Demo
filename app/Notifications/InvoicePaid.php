@@ -15,20 +15,18 @@ class InvoicePaid extends Notification
     use Queueable;
     public $datas;
 
-    public $with = ['group'];
-
-    public function offerGroup()
-    {
-        $id = $this->datas['offerGroup'];
-        return Group::find($id);
-    }
+    // public function offerGroup()
+    // {
+    //     $id = $this->datas['offerGroup'];
+    //     return Group::find($id);
+    // }
 
 
-    public function offerUser()
-    {
-        $id = $this->datas['offerUser'];
-        return User::find($id);
-    }
+    // public function offerUser()
+    // {
+    //     $id = $this->datas['offerUser'];
+    //     return User::find($id);
+    // }
     /**
      * Create a new notification instance.
      *
@@ -56,8 +54,10 @@ class InvoicePaid extends Notification
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'offerUser' => $this->offerUser(),
-            'offerGroup' => $this->offerGroup()
+            'offerUser_Id' => $this->datas['offerUser_Id'],
+            'offerUser_Image' => $this->datas['offerUser_Image'],
+            'offerUser_name' => $this->datas['offerUser_name'],
+            'offerGroup' => $this->datas['offerGroup']
         ]);
     }
     /**
@@ -83,8 +83,10 @@ class InvoicePaid extends Notification
     public function toArray($notifiable)
     {
         return [
-            'offerUser' => $this->offerUser(),
-            'offerGroup' => $this->offerGroup()
+            'offerUser_Id' => $this->datas['offerUser_Id'],
+            'offerUser_Image' => $this->datas['offerUser_Image'],
+            'offerUser_name' => $this->datas['offerUser_name'],
+            'offerGroup' => $this->datas['offerGroup']
 
         ];
     }

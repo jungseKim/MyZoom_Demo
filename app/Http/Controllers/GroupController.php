@@ -15,6 +15,20 @@ use App\Notifications\InvoicePaid;
 
 class GroupController extends Controller
 {
+    public function info($id)
+    {
+
+        $gorup = Group::find($id);
+        $userIn = true;
+        foreach ($gorup->users as $user) {
+            if ($user['id'] == auth()->user()->id) {
+                $userIn = false;
+                break;
+            }
+        }
+        return ['group' => Group::find($id)->load('user'), 'userIn' => $userIn];
+    }
+
     public function show($id)
     {
         return Inertia::render('group/GroupShow', ['group' => Group::find($id)]);
@@ -50,6 +64,7 @@ class GroupController extends Controller
         ]);
 
         $offer = auth()->user();
+
         $gorup = new Group();
         $gorup->user_id = $offer->id;
         $gorup->title = $request->title;
@@ -67,17 +82,19 @@ class GroupController extends Controller
             $users = $request->users;
 
             foreach ($users as $user) {
-                $this->send($gorup->id, $user['id'], $offer->id);
+                $this->send($gorup->id, $user['id'], $offer);
             }
         }
         return redirect()->route('group.index');
     }
 
-    public function send($groupId, $userId, $offerId)
+    public function send($groupId, $userId, $offer)
     {
 
         $datas = [
-            'offerUser' => $offerId,
+            'offerUser_Id' => $offer->id,
+            'offerUser_Image' => $offer->image,
+            'offerUser_name' => $offer->name,
             'offerGroup' => $groupId
         ];
         $user = User::find($userId);
@@ -86,10 +103,8 @@ class GroupController extends Controller
 
     public function userAdd(Request $request)
     {
-        // $a = new group_user();
-        // $a->user_id = auth()->user()->id;
-        // $a->gruop_id = $request->groupId;
-        // $a->save();
+
+
         group_user::create(
             [
                 'user_id' => auth()->user()->id,
@@ -108,18 +123,20 @@ class GroupController extends Controller
 
     public function video($id)
     {
-        $user = auth()->user();
+        $offer = auth()->user();
         $gorup = Group::find($id);
 
         $users = $gorup->users;
         $datas = [
-            'offerUser' => 'offerId',
-            'offerGroup' => 'groupId'
+            'offerUser' => $offer->id,
+            'offerGroup' => $gorup->id
         ];
         foreach ($users as $user) {
-            $user = User::find($user['id']);
-            $when = now()->addMinutes(1);
-            $user->notify(new GroupNotice($datas))->delay($when);
+            if ($offer->id != $user->id) {
+                $user = User::find($user['id']);
+                $when = now()->addMinutes(2);
+                $user->notify((new GroupNotice($datas))->delay($when));
+            }
         }
 
 

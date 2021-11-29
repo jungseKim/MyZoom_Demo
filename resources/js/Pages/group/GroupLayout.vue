@@ -32,9 +32,9 @@
                 <span class="ml-2">Dashboard</span>
               </a>
             </li>
-            <li v-if="$page.props.user.notice_number.length>0" class="mt-0">
+            <li v-if="$page.props.notReadNotice" class="mt-0">
                 <div class="flex">
-                  <span class="text-red-300 mx-auto">new  {{$page.props.user.notice_number.length}}</span>
+                  <span class="text-red-300 mx-auto">new  {{$page.props.notReadNotice}}</span>
                 </div>
             </li>
             <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
@@ -137,7 +137,7 @@
                 </div>
   <!-- </section> -->
        
-       <jet-dialog-modal :show="showNotice" @close="showNotice = false">
+       <jet-dialog-modal :show="showNotice" @close="showNotice = false ">
       
 
         <template #content>
@@ -148,7 +148,7 @@
                     </div>
                     <div class="px-3 pb-2">
                     <div >
-                            <span class="font-bold text-lg">{{ showNotice.offerUser.name }}님으로 부터 메세지가 왔습니다</span>
+                            <span class="font-bold text-lg">{{ showNotice.offerUser_name }}님으로 부터 메세지가 왔습니다</span>
                       <!-- <span class="mr-1 font-black">{{showNotice.offerGroup.title}}</span> -->
                     </div>
                     <hr class="my-4">
@@ -197,18 +197,16 @@ export default {
       Echo.private('App.Models.User.' + this.$page.props.user.id)
     .notification((notification) => {
       this.showNotice=notification
-        // console.log(notification);
+       this.$page.props.notReadNotice+=1
     });
   }
   ,
   methods:{
      confirm(check){
       if(check){
-        // this.$page.props.user.notice_number=0
         Inertia.get('/group/notice')
       }
       else{
-        this.$page.props.user.notice_number.push('a')
          this.showNotice=false;
       }
        

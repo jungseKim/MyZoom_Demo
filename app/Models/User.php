@@ -19,7 +19,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     use TwoFactorAuthenticatable;
 
-    protected $with = ['noticeNumber'];
     /**
      * The attributes that are mass assignable.
      *
@@ -41,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->notifications();
     }
+
     public function noticeNumber()
     {
         return $this->unreadNotifications();

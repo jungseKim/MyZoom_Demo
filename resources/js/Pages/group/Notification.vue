@@ -10,12 +10,12 @@
       <div class="select-none cursor-pointer hover:bg-gray-50 flex flex-1 items-center p-4">
         <div class="flex flex-col w-10 h-10 justify-center items-center mr-4">
           <a href="#" class="block relative">
-            <img alt="profil"  :src="notice.data.offerUser.image?notice.data.offerUser.image:`https://ui-avatars.com/api/?name=${notice.data.offerUser.name}&color=7F9CF5&background=EBF4FF`"  class="mx-auto object-cover rounded-full h-10 w-10" />
+            <img alt="profil"  :src="notice.data.offerUser_image?notice.data.offerUser_image:`https://ui-avatars.com/api/?name=${notice.data.offerUser_name}&color=7F9CF5&background=EBF4FF`"  class="mx-auto object-cover rounded-full h-10 w-10" />
           </a>
         </div>
         <div class="flex-1 pl-1 mr-16">
-          <div class="font-medium dark:text-white">{{notice.data.offerUser.name}}</div>
-          <div class="text-gray-600 dark:text-gray-200 text-sm">{{notice.data.offerGroup.introduction}}</div>
+          <div class="font-medium dark:text-white">{{notice.data.offerUser_name}}</div>
+          <!-- <div class="text-gray-600 dark:text-gray-200 text-sm">{{notice.data.offerGroup.introduction}}</div> -->
         </div>
        <div class="flex flex-col">
           <div v-if="!notice.read_at" class="text-red-500 text-bold"> NEW !</div>
@@ -29,7 +29,7 @@
 </div>
 <jet-dialog-modal :show="showNotice" @close="showNotice = false">
         <template #title>
-             {{ showNotice.data.offerUser.name }}의 메세지입니다
+             {{ showNotice.user.name }}의 메세지입니다
         </template>
 
         <template #content>
@@ -43,14 +43,14 @@
                     <div class="px-3 pb-2">
                     <div >
                             <span class="font-bold text-lg">그룹 이름</span>:
-                      <span class="mr-1 font-black">{{showNotice.data.offerGroup.title}}</span>
+                      <span class="mr-1 font-black">{{showNotice.title}}</span>
                     </div>
                     <hr class="my-4">
                     
                    
                     <div class="my-4" >
                            <span class="font-bold text-lg">그룹소개</span><br>
-                        <span>{{showNotice.data.offerGroup.introduction}}</span>
+                        <span>{{showNotice.introduction}}</span>
                     </div>
                     
                     </div>
@@ -58,7 +58,7 @@
                        </template>
 
                      <template #footer>
-                     <jet-secondary-button @click="confirm(true)" class="bg-green-300 w-1/5">
+                     <jet-secondary-button v-if="userIn" @click="confirm(true)" class="bg-green-300 w-1/5">
                             가입하기
                      </jet-secondary-button>
 
@@ -85,7 +85,8 @@ export default {
   ,
   data(){
     return{
-      showNotice:false
+      showNotice:false,
+      userIn:false
     }
   },
   mounted(){
@@ -94,13 +95,20 @@ export default {
   ,
   methods:{
     showThisNotice(showNotice){
-      this.showNotice=showNotice;
+      showNotice.read_at=true;
+      axios.get('/group/info/'+showNotice.data.offerGroup).
+      then((res)=>{
+        console.log(res.data)
+         this.showNotice=res.data.group;
+         this.userIn=res.data.userIn;
+      })
+     
     },
     confirm(check){
       if(check){
         
         axios.post('/group/userAdd',{
-          groupId:this.showNotice.data.offerGroup.id
+          groupId:this.showNotice.id
         }).then((response)=>{
           console.log(response.data)
         })
