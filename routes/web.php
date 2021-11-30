@@ -73,6 +73,9 @@ Route::prefix('group/')->group(function () {
 
     Route::get('info/{id}', [GroupController::class, 'info'])
         ->name('group.info');
+
+    Route::post('Reservation/{id}', [GroupController::class, 'Reservation'])
+        ->name('group.Reservation');
 });
 
 // Route::prefix('notice/')->group(function () {

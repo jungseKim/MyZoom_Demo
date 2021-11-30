@@ -2,26 +2,30 @@
        <!-- component -->
         <jet-dialog-modal :show="show" @close="close">
                 <template #content>
-              <div class="mt-2 p-5 w-40 bg-white rounded-lg shadow-xl">
-              <div class="flex">
-              <select name="hours" class="bg-transparent text-xl appearance-none outline-none">
-              <option v-for="hours in hours" :key="hours" :value="hours">{hours}</option>
-              
+              <div class="flex flex-rows gap-x-3 ">
+              <span class="text-center text-lg text-bold">{{year}}년</span>
+              <span class="text-center text-lg text-bold">{{month}}월</span>
+              <span class="text-center text-lg text-bold">{{day}}일</span>
+                 <select name="hours">
+                     <option v-for="hours in hourses" :key="hours" :value="hours">{{ hours }}</option>
               </select>
-              <span class="text-xl mr-3">:</span>
-              <select name="minutes" class="bg-transparent text-xl appearance-none outline-none mr-4">
-              <option value="0">00</option>
-              <option value="30">30</option>
+                     <span>시</span>
+              <select name="minute">
+                     <option v-for="minute in minutes" :key="minute" :value="minute">{{ minute }}</option>
               </select>
-              <select name="ampm" class="bg-transparent text-xl appearance-none outline-none">
-              <option value="am">AM</option>
-              <option value="pm">PM</option>
-              </select>
-              </div>
+                        <span>분</span>
               </div>
                </template>
                  <template #footer>
-                 
+                        <div class="flex">
+                               <button class="bg-green-300 w-1/5" @click="confirm(false)">
+                                    예약 완료
+                               </button>
+
+                               <button class="bg-red-300 w-1/5" @click="confirm(false)">
+                                    예약 취소
+                               </button>
+                        </div>
                  </template>
          </jet-dialog-modal>
 </template>
@@ -37,13 +41,21 @@ export default {
                      year:null,
                      month:null,
                      day:null,
-                     hours:[]
+                     hourses:[],
+                     minutes :[]
               }
        },
        components:{
               JetDialogModal
        },
        methods:{
+       confirm(check){
+              //라우터 부터 만들고 시작
+                     // if(){
+                            
+                     // }
+                     
+              },
               close(){
             // this.closeable=true;
             this.$emit('close')
@@ -53,12 +65,18 @@ export default {
        ,mounted(){
               let today = new Date();
 
-              this.year = today.getFullYear();
-              this.month = ('0' + (today.getMonth() + 1)).slice(-2);
-              this.day = ('0' + today.getDate()).slice(-2);
-              hours = ('0' + today.getHours()).slice(-2); 
-              for(let i=0; i<hours;i++){
-                     this.hours.push(i+hours)
+              this.year = today.getFullYear(); // 년도
+              this.month = today.getMonth() + 1;  // 월
+              this.date = today.getDate();  // 날짜
+              let day = today.getDay();  // 요일
+              let hours = today.getHours(); // 시
+              let minute = today.getMinutes();  
+             
+              for(let i=hours ; i<25;i++){
+                     this.hourses.push(i)
+              }
+              for(let i=minute ; i<61;i++){
+                     this.minutes.push(i)
               }
 
        }

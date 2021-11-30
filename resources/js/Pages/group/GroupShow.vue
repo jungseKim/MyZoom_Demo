@@ -47,7 +47,7 @@
         </div>
     </div>
   </div>
-  <group-reservation :show="show" />
+  <group-reservation :show="show" @close="show=false"/>
   </template>
 </group-layout>
 </template>

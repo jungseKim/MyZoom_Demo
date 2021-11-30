@@ -37,9 +37,11 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request)
     {
-        if (Auth::check())
-            return array_merge(parent::share($request), [
-                'notReadNotice' => $request->user()->noticeNumber() ? sizeof($request->user()->noticeNumber()->get()) : false
-            ]);
+
+
+        return array_merge(parent::share($request), [
+
+            'notReadNotice' => Auth::check() ? $request->user()->noticeNumber() ? sizeof($request->user()->noticeNumber()->get()) : 0 : false
+        ]);
     }
 }
