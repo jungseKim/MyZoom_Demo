@@ -15,6 +15,11 @@ use App\Notifications\InvoicePaid;
 
 class GroupController extends Controller
 {
+    public function __construct()
+    {                                  //예외
+        $this->middleware(['auth']);
+    }
+
     public function info($id)
     {
 
@@ -92,6 +97,7 @@ class GroupController extends Controller
     {
 
         $datas = [
+            'type' => 'invitation',
             'offerUser_Id' => $offer->id,
             'offerUser_Image' => $offer->image,
             'offerUser_name' => $offer->name,
@@ -112,32 +118,53 @@ class GroupController extends Controller
             ]
         );
     }
+
     public function notice()
     {
         $id = auth()->user()->id;
         $user = User::find($id);
         $notification = $user->notification;
+
         $user->Read();
         return Inertia::render('group/Notification', ['notices' => $notification]);
+    }
+    public function destroy(Request $request, $id)
+    {
+
+
+        $group = Group::find($id);
+        // $request->user()->cannot('update', $group);
+        if ($request->user()->cannot('update', $group)) {
+            abort(403);
+        }
+        // $this->authorize('delete', $group);
+
+        $group->delete();
+        return redirect()->route('group.index');
     }
 
     public function video($id)
     {
-        $offer = auth()->user();
+        $user = auth()->user();
         $gorup = Group::find($id);
 
         $users = $gorup->users;
         $datas = [
-            'offerUser' => $offer->id,
-            'offerGroup' => $gorup->id
+            'offerGroupId' => $gorup->id,
+            'offerGroupTitle' => $gorup->title
         ];
-        foreach ($users as $user) {
-            if ($offer->id != $user->id) {
-                $user = User::find($user['id']);
-                $when = now()->addMinutes(2);
-                $user->notify((new GroupNotice($datas))->delay($when));
+
+        if ($user->id == $gorup->user_id) {
+            foreach ($users as $us) {
+                if ($user->id != $us['id']) {
+                    $user1 = User::find($us['id']);
+                    $user1->notify(new GroupNotice($datas));
+                }
             }
         }
+
+        //방장이 시작한 이후 1번만 실행되야 됨 
+
 
 
         return Inertia::render('chat/VideoChat')->with([
@@ -147,7 +174,28 @@ class GroupController extends Controller
 
         ]);
     }
-    public function groupSend()
+    public function Reservation(Request $request, $id)
     {
+        $offer = auth()->user();
+        $gorup = Group::find($id);
+
+        $users = $gorup->users;
+        $datas = [
+            'type' => 'videoStrat',
+            'offerGroupId' => $gorup->id,
+            'offerGroupTitle' => $gorup->title
+        ];
+        $this->groupSend($users, $offer, $datas, $request->delay);
+    }
+
+    public function groupSend($users, $offer, $datas, $delay)
+    {
+        foreach ($users as $user) {
+            if ($offer->id != $user->id) {
+                $user = User::find($user['id']);
+                $when = now()->addMinutes($delay);
+                $user->notify((new GroupNotice($datas))->delay($when));
+            }
+        }
     }
 }

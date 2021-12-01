@@ -32,8 +32,9 @@ class GroupNotice extends Notification implements ShouldQueue
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'offerUser' => '김정세',
-            'offerGroup' => '캡스톤'
+            'group' => 'true',
+            'offerGroupId' => $this->datas['offerGroupId'],
+            'offerGroupTitle' => $this->datas['offerGroupTitle']
         ]);
     }
     /**
@@ -44,7 +45,7 @@ class GroupNotice extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['broadcast'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -70,7 +71,9 @@ class GroupNotice extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            //
+            'group' => 'true',
+            'offerGroupId' => $this->datas['offerGroupId'],
+            'offerGroupTitle' => $this->datas['offerGroupTitle']
         ];
     }
 }

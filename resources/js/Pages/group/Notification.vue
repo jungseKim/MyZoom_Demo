@@ -1,27 +1,14 @@
 <template>
 <group-layout>
-                      <template #content>
-                       
+  <template #content>                     
   <div class="m-10">
     <div class="text-center px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 bg-clip-padding bg-opacity-60 border border-gray-200" style="backdrop-filter: blur(20px);">
        <h1 class="text-2xl text-base  font-extrabold"> 알림 목록</h1>
   <ul class="flex flex-col divide-y w-full p-5">
-    <li class="flex flex-row" v-for="notice in notices" :key="notice.id" @click="showThisNotice(notice)">
-      <div class="select-none cursor-pointer hover:bg-gray-50 flex flex-1 items-center p-4">
-        <div class="flex flex-col w-10 h-10 justify-center items-center mr-4">
-          <a href="#" class="block relative">
-            <img alt="profil"  :src="notice.data.offerUser_image?notice.data.offerUser_image:`https://ui-avatars.com/api/?name=${notice.data.offerUser_name}&color=7F9CF5&background=EBF4FF`"  class="mx-auto object-cover rounded-full h-10 w-10" />
-          </a>
-        </div>
-        <div class="flex-1 pl-1 mr-16">
-          <div class="font-medium dark:text-white">{{notice.data.offerUser_name}}</div>
-          <!-- <div class="text-gray-600 dark:text-gray-200 text-sm">{{notice.data.offerGroup.introduction}}</div> -->
-        </div>
-       <div class="flex flex-col">
-          <div v-if="!notice.read_at" class="text-red-500 text-bold"> NEW !</div>
-          <div class="text-gray-600 dark:text-gray-200 text-xs">{{notice.created_at}}</div>
-       </div>
-      </div>
+    <li class="flex flex-row" v-for="notice in notices" :key="notice.id" @click="showThisNotice(notice) ">
+      <group-notice v-if="notice.data.group" :notice="notice" />
+      <user-notice v-else :notice="notice"/>
+     <i @click="noticeRemove(notice.id)" class="fas fa-trash-alt fa-x self-center hover:bg-gray-50 "></i>
     </li>
   </ul>
 
@@ -67,6 +54,7 @@
                      </jet-secondary-button>
                      </template>
               </jet-dialog-modal>
+    <group-strat-modal :gruop="group" :show="group" @close="group=false"/>
    </template>
 </group-layout>
 </template>
@@ -78,7 +66,9 @@ import GroupLayout from './GroupLayout.vue'
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
 import axios from 'axios'
-
+import UserNotice from './UserNotice.vue'
+import GroupNotice from './GroupNotice.vue'
+import GroupStratModal from './GroupStratModal.vue'
 import { Inertia } from '@inertiajs/inertia'
 export default {
   props:['notices']
@@ -86,7 +76,8 @@ export default {
   data(){
     return{
       showNotice:false,
-      userIn:false
+      userIn:false,
+      group:false
     }
   },
   mounted(){
@@ -94,8 +85,20 @@ export default {
   }
   ,
   methods:{
+    noticeRemove(id){
+      axios.delete('/notice/destroy/'+id)
+      .then((res)=>{
+        console.log('success')
+      })
+       Inertia.reload({ only: ['notices'] })
+      // axios.delete()
+    },
     showThisNotice(showNotice){
       showNotice.read_at=true;
+      if(showNotice.data.group){
+        this.group=showNotice.data
+        return
+      }
       axios.get('/group/info/'+showNotice.data.offerGroup).
       then((res)=>{
         console.log(res.data)
@@ -110,14 +113,20 @@ export default {
         axios.post('/group/userAdd',{
           groupId:this.showNotice.id
         }).then((response)=>{
-          console.log(response.data)
+          Inertia.get('/group/show/'+this.showNotice.id)
         })
       }
         this.showNotice=false;
     }
   }
   ,
-  components: { Button ,GroupLayout,JetSecondaryButton,JetDialogModal},
+  components: { Button 
+  ,GroupLayout,
+  JetSecondaryButton,
+  JetDialogModal,
+  UserNotice,
+  GroupNotice,
+  GroupStratModal},
        
 }
 </script>

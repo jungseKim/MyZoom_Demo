@@ -59,7 +59,7 @@
                      </div>
     </div>
          </div>
-
+<!-- 
          <jet-dialog-modal :show="searchUser" @close="searchUser = false">
         <template #title>
              유저정보
@@ -76,10 +76,7 @@
                     <div class="px-3 pb-2">
                     <div class="flex flex-row items-center mt-2">
                      
-                        <!-- <Link :href="'/profile/'+viewed_user.name">
-                            <span class="mr-1 font-black">{{viewed_user.name}}</span>
-                        </Link> -->
-                      
+            
                     </div>
                     <hr class="my-4">
                     <div >
@@ -101,7 +98,9 @@
                             초대하기
                      </jet-secondary-button>
                      </template>
-              </jet-dialog-modal>
+              </jet-dialog-modal> -->
+       <user-search-modal :searchUser="searchUser" @close="searchUser=false" @userAdd="userAdd" />
+       
          </template>
 </group-layout>
 </template>
@@ -113,11 +112,13 @@ import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
 import JetDialogModal from '@/Jetstream/ConfirmationModal.vue'
 import JetInput from '@/Jetstream/Input.vue'
 import JetLabel from '@/Jetstream/Label.vue'
+import UserSearchModal from  './UserSearchModal.vue'
  
 import { useForm } from '@inertiajs/inertia-vue3'   
 import { Inertia } from '@inertiajs/inertia'
 export default {
        components:{
+              UserSearchModal,
               GroupLayout,
               JetSecondaryButton,
             JetDialogModal,

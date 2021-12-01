@@ -6,6 +6,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\VideoChatController;
 use App\Models\Group;
 use Illuminate\Foundation\Application;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -76,10 +77,14 @@ Route::prefix('group/')->group(function () {
 
     Route::post('Reservation/{id}', [GroupController::class, 'Reservation'])
         ->name('group.Reservation');
+
+    Route::delete('destroy/{id}', [GroupController::class, 'destroy']);
 });
 
-// Route::prefix('notice/')->group(function () {
+Route::prefix('notice/')->group(function () {
 
-//     Route::get('index', [NoticeController::class, 'index'])
-//         ->name('notice.index');
-// });
+    Route::get('index', [NoticeController::class, 'index'])
+        ->name('notice.index');
+
+    Route::delete('destroy/{id}', [NoticeController::class, 'destroy']);
+});

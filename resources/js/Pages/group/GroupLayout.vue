@@ -42,7 +42,7 @@
               <span>
                 <i class="far fa-envelope"></i>
               </span>
-              <a :href="route('group.notice')" :active="route().current('group.notice')">
+              <a :href="route('notice.index')" :active="route().current('notice.index')">
                
                 <span class="ml-2">Notification</span>
               </a>
@@ -138,8 +138,6 @@
   <!-- </section> -->
        
        <jet-dialog-modal :show="showNotice" @close="showNotice = false ">
-      
-
         <template #content>
                <div class="w-full mx-3 overflow-hidden bg-white border rounded md:w-12/12 md:mx-0 lg:mx-0">
                 <div class="flex justify-between w-full p-3">
@@ -168,7 +166,8 @@
                      </jet-secondary-button>
                      </template>
               </jet-dialog-modal>
-      
+
+        <group-strat-modal :gruop="group" :show="group" @close="group=false"/>
 </div>
 
 
@@ -179,25 +178,35 @@
 import JetNavLink from '@/Jetstream/NavLink.vue'
 import JetDialogModal from '@/Jetstream/DialogModal.vue'
 import JetSecondaryButton from '@/Jetstream/SecondaryButton.vue'
-
+import GroupStratModal from './GroupStratModal.vue'
 import { Inertia } from '@inertiajs/inertia'
 export default {
   components:{
     JetNavLink,
     JetDialogModal,
-    JetSecondaryButton
+    JetSecondaryButton,
+    GroupStratModal
   },
   data(){
     return{
-      showNotice:false
+      showNotice:false,
+      group:false
     }
   }
   ,
   mounted(){
       Echo.private('App.Models.User.' + this.$page.props.user.id)
     .notification((notification) => {
-      this.showNotice=notification
-       this.$page.props.notReadNotice+=1
+      console.log(notification)
+      if(notification.group){
+          this.group=notification
+      }
+      else{
+        this.showNotice=notification
+      }
+      //이거 온리 로 바꾸자 
+        Inertia.reload({ only: ['notReadNotice'] })
+      //  this.$page.props.notReadNotice+=1
     });
   }
   ,

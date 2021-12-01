@@ -24,9 +24,7 @@
                   {{ user.name }}
                 </p>
               </li>
-
-            </ul>
-           
+            </ul> 
           </div>
           
         </div>
@@ -45,6 +43,9 @@
          <button v-if="group.user_id==$page.props.user.id" @click="nowSatrt" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">바로시작</button>
            <button @click="dataClick" v-if="group.user_id==$page.props.user.id" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">예약하기</button>
         </div>
+         <div v-if="group.user_id==$page.props.user.id"  @click="GroupRemove" class="flex flex-row-reverse">
+           <i  class="fas fa-trash-alt fa-2x self-center hover:bg-red-300 "></i>
+         </div>
     </div>
   </div>
   <group-reservation :show="show" @close="show=false"/>
@@ -74,7 +75,11 @@ export default {
           },
           dataClick(){
             this.show=true;
+          },
+          GroupRemove(){
+            Inertia.delete('/group/destroy/'+this.group.id)
           }
+          
        }
 
 }
