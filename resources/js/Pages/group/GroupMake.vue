@@ -32,17 +32,17 @@
                             <div class="bg-white shadow-xl rounded-lg w-2/3">
                                    <ul class="divide-y divide-gray-300">
                                    <li v-for="user in users" :key="user.id" class="p-4 hover:bg-gray-50 cursor-pointer text-bold">
-                                     
+
                                      <div class="flex flex justify-between ">
                                               <img
-                                   :src="user.image?user.image:`https://ui-avatars.com/api/?name=${user.name}&color=7F9CF5&background=EBF4FF`" 
+                                   :src="user.image?user.image:`https://ui-avatars.com/api/?name=${user.name}&color=7F9CF5&background=EBF4FF`"
                                    class="w-1/5 rounded-full"/>
-                                         <span class="self-center mr-5 text-2xl text-bold">{{ user.name }}</span> 
+                                         <span class="self-center mr-5 text-2xl text-bold">{{ user.name }}</span>
                                          <i @click="userRemove(user)" class="fas fa-trash-alt self-center fa-2x hover:bg-gray-50 "></i>
                                      </div>
-                               
+
                                    </li>
-                                  
+
                                    </ul>
                               </div>
                      </div>
@@ -55,11 +55,11 @@
                             class="mr-4 inline-flex justify-center w-24 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md ring ring-gray-500 ring-offset-4  text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2  focus:ring-indigo-500">
                             Create
                         </button>
-                       
+
                      </div>
     </div>
          </div>
-<!-- 
+<!--
          <jet-dialog-modal :show="searchUser" @close="searchUser = false">
         <template #title>
              유저정보
@@ -75,20 +75,20 @@
                         <img v-else  src="/noimage.jpg" class="mx-auto w-20 h-20 rounded-full" :alt="searchUser.name">
                     <div class="px-3 pb-2">
                     <div class="flex flex-row items-center mt-2">
-                     
-            
+
+
                     </div>
                     <hr class="my-4">
                     <div >
                             <span class="font-bold text-lg">이름</span><br>
                       <span class="mr-1 font-black">{{searchUser.name}}</span>
                     </div>
-                   
+
                     <div class="my-4" >
                            <span class="font-bold text-lg">이메일</span><br>
                         <span>{{searchUser.email}}</span>
                     </div>
-                    
+
                     </div>
             </div>
                      </template>
@@ -99,8 +99,8 @@
                      </jet-secondary-button>
                      </template>
               </jet-dialog-modal> -->
-       <user-search-modal :searchUser="searchUser" @close="searchUser=false" @userAdd="userAdd" />
-       
+       <user-search-modal :searchUser="searchUser" @close="searchUser=false" @userAdd="userAdd()" />
+
          </template>
 </group-layout>
 </template>
@@ -113,8 +113,8 @@ import JetDialogModal from '@/Jetstream/ConfirmationModal.vue'
 import JetInput from '@/Jetstream/Input.vue'
 import JetLabel from '@/Jetstream/Label.vue'
 import UserSearchModal from  './UserSearchModal.vue'
- 
-import { useForm } from '@inertiajs/inertia-vue3'   
+
+import { useForm } from '@inertiajs/inertia-vue3'
 import { Inertia } from '@inertiajs/inertia'
 export default {
        components:{
@@ -141,12 +141,13 @@ export default {
                     this.users.splice(this.users.indexOf(user), 1);
               },
               store(){
-                   
+
                       const form = useForm({
                             users:this.users,
                             title:this.title,
                             introduction:this.introduction
                             })
+                    console.log(form);
                     Inertia.post('/group/store',form,{
                         onError:(errors)=>this.errnow(errors)
                     })
@@ -161,7 +162,7 @@ export default {
               userAdd(){
                      this.users.push({
                             id:this.searchUser.id,
-                            name:this.searchUser.name,  
+                            name:this.searchUser.name,
                             image:this.searchUser.image
                      })
                      this.searchUser=false

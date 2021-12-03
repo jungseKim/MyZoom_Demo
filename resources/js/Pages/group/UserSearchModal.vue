@@ -20,26 +20,35 @@
                             <span class="font-bold text-lg">이름</span><br>
                       <span class="mr-1 font-black">{{searchUser.name}}</span>
                     </div>
-                   
+
                     <div class="my-4" >
                            <span class="font-bold text-lg">이메일</span><br>
                         <span>{{searchUser.email}}</span>
                     </div>
-                    
+
                     </div>
             </div>
                      </template>
 
                      <template #footer>
-                     <jet-secondary-button @click="$emit=userAdd">
+                     <button class="bg-green-200" @click="userAdd">
                             초대하기
-                     </jet-secondary-button>
+                     </button>
                      </template>
               </jet-dialog-modal>
 </template>
 
 <script>
+import JetDialogModal from '@/Jetstream/ConfirmationModal.vue'
 export default {
-       props:['searchUser']
+       props:['searchUser'],
+       components:{
+           JetDialogModal
+       },
+       methods:{
+           userAdd(){
+               this.$emit('userAdd');
+           }
+       }
 }
 </script>

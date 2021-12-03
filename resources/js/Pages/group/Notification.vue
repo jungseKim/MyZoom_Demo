@@ -1,6 +1,6 @@
 <template>
 <group-layout>
-  <template #content>                     
+  <template #content>
   <div class="m-10">
     <div class="text-center px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 bg-clip-padding bg-opacity-60 border border-gray-200" style="backdrop-filter: blur(20px);">
        <h1 class="text-2xl text-base  font-extrabold"> 알림 목록</h1>
@@ -33,13 +33,13 @@
                       <span class="mr-1 font-black">{{showNotice.title}}</span>
                     </div>
                     <hr class="my-4">
-                    
-                   
+
+
                     <div class="my-4" >
                            <span class="font-bold text-lg">그룹소개</span><br>
                         <span>{{showNotice.introduction}}</span>
                     </div>
-                    
+
                     </div>
                 </div>
                        </template>
@@ -54,7 +54,7 @@
                      </jet-secondary-button>
                      </template>
               </jet-dialog-modal>
-    <group-strat-modal :gruop="group" :show="group" @close="group=false"/>
+    <group-strat-modal :gruop="group"  @close="group=false"/>
    </template>
 </group-layout>
 </template>
@@ -105,28 +105,30 @@ export default {
          this.showNotice=res.data.group;
          this.userIn=res.data.userIn;
       })
-     
+
     },
     confirm(check){
       if(check){
-        
+
         axios.post('/group/userAdd',{
           groupId:this.showNotice.id
         }).then((response)=>{
           Inertia.get('/group/show/'+this.showNotice.id)
         })
+      }else{
+
+          this.showNotice=false;
       }
-        this.showNotice=false;
     }
   }
   ,
-  components: { Button 
+  components: { Button
   ,GroupLayout,
   JetSecondaryButton,
   JetDialogModal,
   UserNotice,
   GroupNotice,
   GroupStratModal},
-       
+
 }
 </script>

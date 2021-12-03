@@ -33,7 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function groups()
     {
         // return $this->hasMany(user_room::class);
-        return $this->belongsToMany(Group::class);
+        return $this->hasMany(Group::class);
     }
 
     public function notification()

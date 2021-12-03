@@ -10,7 +10,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class InvoicePaid extends Notification
+class InvoicePaid extends Notification implements ShouldQueue
 {
     use Queueable;
     public $datas;
@@ -45,7 +45,7 @@ class InvoicePaid extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['database','broadcast'];
     }
     public function broadcastType()
     {

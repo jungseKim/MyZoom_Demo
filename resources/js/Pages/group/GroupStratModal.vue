@@ -13,8 +13,8 @@
                             <span class="font-bold text-lg">Group: {{ gruop.offerGroupTitle }} </span>
                       <!-- <span class="mr-1 font-black">{{showNotice.offerGroup.title}}</span> -->
                     </div>
-                    
-                
+
+
                     </div>
                 </div>
                        </template>
