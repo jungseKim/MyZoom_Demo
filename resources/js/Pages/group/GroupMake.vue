@@ -165,6 +165,7 @@ export default {
                             name:this.searchUser.name,
                             image:this.searchUser.image
                      })
+                     this.name=null;
                      this.searchUser=false
               },
               search(){

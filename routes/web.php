@@ -79,6 +79,9 @@ Route::prefix('group/')->group(function () {
         ->name('group.Reservation');
 
     Route::delete('destroy/{id}', [GroupController::class, 'destroy']);
+
+    Route::post('eazyAdd/{group_id}', [GroupController::class, 'eazyAdd'])
+        ->name('group.eazyAdd');
 });
 
 Route::prefix('notice/')->group(function () {
@@ -87,4 +90,8 @@ Route::prefix('notice/')->group(function () {
         ->name('notice.index');
 
     Route::delete('destroy/{id}', [NoticeController::class, 'destroy']);
+
+
+    Route::post('Reservation/{id}', [NoticeController::class, 'Reservation'])
+        ->name('notice.Reservation');
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\Reservation;
 use App\Models\User;
 use App\Notifications\GroupNotice;
 use Illuminate\Http\Request;
@@ -37,7 +38,20 @@ class NoticeController extends Controller
         $offer = auth()->user();
         $gorup = Group::find($id);
 
+        if (Reservation::where('group_id', $gorup->id)->exists()) {
+            return 302;
+        }
+        // $timestamp = strtotime("2020-11-02 13:03:09 +" . $request->delay . " minute");
+        $timestamp = strtotime(date("Y-m-d H:i:s") . ' +' . $request->delay . " minute");
+        $newDateTime = date("Y-m-d H:i:s", $timestamp);
+
+        $Re = new Reservation();
+        $Re->group_id = $gorup->id;
+        $Re->Time = $newDateTime;
+        $Re->save();
+
         $users = $gorup->users;
+
         $datas = [
             'type' => 'videoStrat',
             'offerGroupId' => $gorup->id,

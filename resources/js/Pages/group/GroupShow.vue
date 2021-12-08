@@ -42,13 +42,17 @@
         <div class="flex m-5 items-center space-x-10">
          <button v-if="group.user_id==$page.props.user.id" @click="nowSatrt" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">바로시작</button>
            <button @click="dataClick" v-if="group.user_id==$page.props.user.id" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">예약하기</button>
+          <user-search-modal :searchUser="searchUser" @close="searchUser=false" @userAdd="userAdd()" />
         </div>
-         <div v-if="group.user_id==$page.props.user.id"  @click="GroupRemove" class="flex flex-row-reverse">
+         <div class="flex flex-rows" v-if="group.user_id==$page.props.user.id">
+                <input id="title" class="w-full" type="text" v-model="name" ref="inputs" @keyup.enter="search"><i @click="search()" class="fas fa-search fa-2x"></i>
+           </div>
+         <div   @click="GroupRemove" class="flex flex-row-reverse">
            <i  class="fas fa-trash-alt fa-2x self-center hover:bg-red-300 "></i>
          </div>
     </div>
   </div>
-  <group-reservation :show="show" @close="show=false"/>
+  <group-reservation :show="show" :groupId="group.id" @close="show=false"/>
   </template>
 </group-layout>
 </template>
@@ -56,16 +60,21 @@
 
 import GroupLayout from './GroupLayout.vue'
 import { Inertia } from '@inertiajs/inertia'
+import UserSearchModal from  './UserSearchModal.vue'
 import GroupReservation from './GroupReservation.vue'
+import axios from 'axios'
 export default {
     props:['group'],
        components:{
               GroupLayout,
-              GroupReservation
+              GroupReservation,
+              UserSearchModal
        },
        data(){
          return{
-           show:false
+           show:false,
+           nama:null,
+           searchUser:null
          }
        }
        ,
@@ -78,7 +87,39 @@ export default {
           },
           GroupRemove(){
             Inertia.delete('/group/destroy/'+this.group.id)
-          }
+          },
+          search(){
+                    if(this.name==this.$page.props.user.name){
+                          return alert('자신을 초대할 수없습니다.')
+                    }
+                    axios.get('/group/search', {
+                          params: {
+                          name: this.name
+                          }
+                    }).then(response=>{
+                          console.log(response.data)
+                          if(response.data==404){
+                                return alert('없는 회원입니다')
+                          }
+                          this.searchUser=response.data
+                    }).catch((err)=>{
+                          console.log(err)
+                    })
+            },
+            userAdd(){
+              axios.post('/group/eazyAdd/'+this.group.id,{
+                user_id:this.searchUser.id
+              }).then((res)=>{
+                console.log(res.data)
+                if(res.data==300){
+                  return alert('이미 그룹내에 포함 되어있습니다')
+                }
+                return alert('가입신청을 전송하였습니다.')
+              })
+            this.name=null;
+            this.searchUser=false
+            }
+            
           
        }
 

@@ -107,6 +107,21 @@ class GroupController extends Controller
         $user->notify(new InvoicePaid($datas));
     }
 
+    public function eazyAdd(Request $request, $group_Id)
+    {
+        // $user = User::find($request->user_id);
+        $users = Group::find($group_Id)->users;
+        foreach ($users as $user) {
+            if ($user->id == $request->user_id) {
+                return 300;
+            }
+        }
+        $offer = auth()->user();
+        $this->send($group_Id, $request->user_id, $offer);
+        return 201;
+    }
+
+
     public function userAdd(Request $request)
     {
 
@@ -130,16 +145,15 @@ class GroupController extends Controller
     }
     public function destroy(Request $request, $id)
     {
-
-
         $group = Group::find($id);
-        // $request->user()->cannot('update', $group);
-        if ($request->user()->cannot('update', $group)) {
-            abort(403);
-        }
-        // $this->authorize('delete', $group);
+        $user = $request->user();
 
-        $group->delete();
+        if ($user->cannot('delete', $group)) {
+            group_user::where('user_id', $user->id)->where('group_id', $group->id)->delete();
+        } else {
+            $group->delete();
+        }
+
         return redirect()->route('group.index');
     }
 
