@@ -6,7 +6,7 @@
 
     <div v-if="SharedScreen" class="h-3/5 flex flex-col">
          <div class="flex flex-row-reverse gap-4   mt-0 pb-0 ">
-              <div class="flex flex-col w-1/4 mb-0 pb-0 border-2" v-for="user in users" :key="user.id">
+              <div class="flex flex-col w-1/6 mb-0 pb-0 border-2" v-for="user in users" :key="user.id">
               <video class="object-cover h-full  w-full"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-center " >
                 <div></div>
@@ -15,7 +15,7 @@
                 <i v-else class="fas fa-microphone"></i>
                 </div>
                </div>
-             <div class="flex flex-col w-1/4 mb-0 pb-0 border-2">
+             <div class="flex flex-col w-1/6 mb-0 pb-0 border-2">
                <video
                 class="object-cover h-full  w-full"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
