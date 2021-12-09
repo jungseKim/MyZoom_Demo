@@ -64,7 +64,7 @@
        </div>
     </div >
     <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
-        <button 
+        <button
         v-if="isManager"
         @click="start"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
@@ -117,7 +117,7 @@ export default {
   ,
   beforeUnmount(){
       this.RoomOut();
-    
+
 
   },
   mounted() {
@@ -184,7 +184,11 @@ export default {
             delete this.peers[user.id+'SharedScreen'];
              }
           }
-          this.videoCom();
+        //   let vm=this;
+          setTimeout(function() {
+            vm.videoCom()}, 300);
+        //   setTimeout()
+
     //  document.documentElement.requestFullscreen()
 
     },
@@ -220,6 +224,8 @@ export default {
       if(this.activeVideo && this.stream){
         const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.stream;
+         videoHere.muted=true;
+
       }
 
         for(let key in this.users){
@@ -250,7 +256,7 @@ export default {
 
         })
         .on('stream', (stream) => {
-          
+
         if(userName=='SharedScreen'){
             console.log("ddkdkdkd")
             this.SharedStream=stream
@@ -278,7 +284,7 @@ export default {
             vm.videoCom()}, 300);
           }
           // const peer = this.peers[userId+userName];
-        
+
           // if(peer !== undefined) {
           //   peer.destroy();
           // }
@@ -292,7 +298,7 @@ export default {
       }
       return this.peers[userId+userName];
     },
-    
+
     close(permision){
         this.show=false;
 
@@ -302,6 +308,7 @@ export default {
           else{
              const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.streamPermision;
+            videoHere.muted=true;
             this.activeVideo=true
           }
        this.peerConnetion()
@@ -314,8 +321,6 @@ export default {
             if(track.kind=='video'){
                 track.enabled=!track.enabled
                 vm.activeVideo=track.enabled
-
-                
                 }
             });
     },
@@ -329,7 +334,7 @@ export default {
 
                 vm.channel.whisper('client-media-'+vm.roomId, {
                 userId: vm.user.id,
-                activeOudio:vm.activeOudio 
+                activeOudio:vm.activeOudio
            });
                 }
             });
@@ -337,8 +342,8 @@ export default {
      catch(err){
        alert('오디오가 없음')
      }
-         
-            
+
+
     }
 
     ,
@@ -403,8 +408,8 @@ export default {
           this.users[user.id]=user
           if(this.SharedStream && this.isManager){
              vm.getPeer(user.id,'SharedScreen',true,vm.SharedStream,'SharedScreen')
-          
-           
+
+
           }
      })
       .leaving((user) => {
@@ -423,12 +428,12 @@ export default {
         //     peer.destroy();
         //   }
           console.log('유저 나감')
-          
+
           delete this.peers[user.id+user.name];
       })
       .listenForWhisper('client-signal-'+this.user.id,(signal)=>{
           this.users[signal.userId].activeOudio=signal.activeOudio
-        
+
         if(signal.userName=='SharedScreen'){
             this.SharedScreen=true
             const peer = this.getPeer(signal.userId,'SharedScreen' ,false,null,'SharedScreen');
@@ -448,7 +453,7 @@ export default {
               console.log(data)
                this.users[data.userId].activeOudio=data.activeOudio
         });
-      
+
     },
   }
 };
