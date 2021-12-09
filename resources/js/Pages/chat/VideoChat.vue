@@ -4,20 +4,20 @@
     <h1 class="text-center">Laravel Video Chat</h1>
     <div class="w-full flex flex-rows p-10">
 
-      <div v-if="SharedScreen" class="h-3/5">
-         <div class="flex flex-rows space-x-2 h-1/5">
-              <div class="relative " v-for="user in users" :key="user.id">
-              <video class="object-cover m-auto  z-0"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
+    <div v-if="SharedScreen" class="h-3/5 flex flex-col">
+         <div class="flex flex-row-reverse gap-4   mt-0 pb-0 ">
+              <div class="flex flex-col w-1/4 mb-0 pb-0 " v-for="user in users" :key="user.id">
+              <video class="object-cover h-full  w-full"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-center " >
                 <div></div>
                 <h1 class=" font-bold text-lg" >{{user.name}}</h1>
                 <i v-if="!user.activeOudio" class="fas fa-microphone-slash "></i>
                 <i v-else class="fas fa-microphone"></i>
                 </div>
-            </div>
-             <div class="relative">
+               </div>
+             <div class="flex flex-col w-1/4 mb-0 pb-0">
                <video
-                class="object-cover m-auto  z-0"
+                class="object-cover h-full  w-full"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
                  <div class="flex  justify-center" >
@@ -29,7 +29,7 @@
              </div>
          </div>
          <div class="p-5">
-             <video class="m-auto w-4/5  object-cover mb-20" ref="SharedScreen" autoplay muted></video>
+             <video class="m-auto w-4/5  h-7/8 object-cover mb-20" ref="SharedScreen" autoplay muted></video>
          </div>
       </div>
 
@@ -314,6 +314,8 @@ export default {
             if(track.kind=='video'){
                 track.enabled=!track.enabled
                 vm.activeVideo=track.enabled
+
+                
                 }
             });
     },

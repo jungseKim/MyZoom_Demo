@@ -47,12 +47,25 @@
          <div class="flex flex-rows" v-if="group.user_id==$page.props.user.id">
                 <input id="title" class="w-full" type="text" v-model="name" ref="inputs" @keyup.enter="search"><i @click="search()" class="fas fa-search fa-2x"></i>
            </div>
-         <div   @click="GroupRemove" class="flex flex-row-reverse">
+          
+        <div class="text-center"><p class="font-bold text-xl ">회의기록</p></div>
+            <ul class="list-disc space-y-2 divide-y-2 divide-border-black rounded-md  p-2  border-2  p-5">
+              <li  v-for="re in reservations" :key="re.id" class="flex items-start">
+                <p v-if="nowTime(re.Time)" class="m-0 text-xl text-red-700">예약중 </p>
+                <p class="m-auto text-2xl font-bold">
+                  {{ re.Time }}
+                </p>
+                <i v-if="group.user_id==$page.props.user.id && nowTime(re.Time)" @click="cancle(re)" class="fas fa-times self-center"></i>
+              </li>
+            </ul> 
+
+
+         <div   @click="GroupRemove" class="mt-5 flex flex-row-reverse">
            <i  class="fas fa-trash-alt fa-2x self-center hover:bg-red-300 "></i>
          </div>
     </div>
   </div>
-  <group-reservation :show="show" :groupId="group.id" @close="show=false"/>
+  <group-reservation :show="show" :groupId="group.id" @close="close"/>
   </template>
 </group-layout>
 </template>
@@ -64,7 +77,7 @@ import UserSearchModal from  './UserSearchModal.vue'
 import GroupReservation from './GroupReservation.vue'
 import axios from 'axios'
 export default {
-    props:['group'],
+    props:['group','reservations'],
        components:{
               GroupLayout,
               GroupReservation,
@@ -79,6 +92,28 @@ export default {
        }
        ,
        methods:{
+         cancle(re){
+           const vm=this;
+           axios.delete('/notice/cancle/'+re.id).
+           then((res)=>{
+             console.log(res)
+             vm.$inertia.reload(['reservations'])
+           })
+         },
+         close(){
+           this.show=false;
+           this.$inertia.reload(['reservations'])
+         },
+          nowTime(t){
+            var re = new Date(t);
+            var now = new Date();
+            if(re>now){
+              return true;
+            }
+            else{
+              return false;
+            }
+          },  
           nowSatrt(){
              Inertia.get('/group/video/'+this.group.id)
           },

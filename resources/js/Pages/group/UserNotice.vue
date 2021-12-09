@@ -1,6 +1,6 @@
 <template>
         <div class="select-none cursor-pointer hover:bg-gray-50 flex flex-1 items-center p-4">
-       <div @click="$emit=showThisNotice(notice)" class="flex justis-start">
+       <div  class="flex justis-start">
        <div class="flex flex-col w-10 h-10 justify-center items-center mr-4">
           <a href="#" class="block relative">
             <img alt="profil"  :src="notice.data.offerUser_image?notice.data.offerUser_image:`https://ui-avatars.com/api/?name=${notice.data.offerUser_name}&color=7F9CF5&background=EBF4FF`"  class="mx-auto object-cover rounded-full h-10 w-10" />

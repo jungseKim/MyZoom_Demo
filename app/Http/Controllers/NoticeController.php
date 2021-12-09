@@ -38,12 +38,20 @@ class NoticeController extends Controller
         $offer = auth()->user();
         $gorup = Group::find($id);
 
-        if (Reservation::where('group_id', $gorup->id)->exists()) {
-            return 302;
-        }
+        // if (Reservation::where('group_id', $gorup->id)->exists()) {
+        //     return 302;
+        // }
         // $timestamp = strtotime("2020-11-02 13:03:09 +" . $request->delay . " minute");
         $timestamp = strtotime(date("Y-m-d H:i:s") . ' +' . $request->delay . " minute");
         $newDateTime = date("Y-m-d H:i:s", $timestamp);
+
+        foreach ($gorup->reservations as $re) {
+            if ($re->Time > date("Y-m-d H:i:s", (strtotime(date("Y-m-d H:i:s"))))) {
+                // dd(strtotime(date("Y-m-d H:i:s")));
+                return 302;
+            }
+        }
+
 
         $Re = new Reservation();
         $Re->group_id = $gorup->id;
@@ -63,11 +71,17 @@ class NoticeController extends Controller
     public function groupSend($users, $offer, $datas, $delay)
     {
         foreach ($users as $user) {
-            if ($offer->id != $user->id) {
-                $user = User::find($user['id']);
-                $when = now()->addMinutes($delay);
-                $user->notify((new GroupNotice($datas))->delay($when));
-            }
+            $user = User::find($user['id']);
+            $when = now()->addMinutes($delay);
+            $user->notify((new GroupNotice($datas))->delay($when));
+        }
+    }
+    public function cancle($id)
+    {
+        $user = auth()->user();
+        if (Reservation::find($id)->group->user_id == $user->id) {
+            Reservation::find($id)->delete();
+            DB::table('jobs')->delete();
         }
     }
 }

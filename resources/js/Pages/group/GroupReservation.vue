@@ -72,14 +72,19 @@ export default {
        },
        confirm(check){
               if(check){
-                     const vm=this;
                      // console.log(+this.H*60+(+this.M))
                      axios.post('/notice/Reservation/'+this.groupId,{
                             delay:(+this.H*60+(+this.M))
                      }).then((res)=>{
-                            vm.close()
+                            if(res.data==302){
+                                   alert('이미 예약중인 회의가 있습니다.')
+                            }else{
+                                   alert('예약이 완료되었습니다.')
+                            }
+                            
                      })
-              }                    
+              }    
+              this.close()                
        },
 
               close(){

@@ -195,7 +195,8 @@ export default {
   }
   ,
   mounted(){
-      Echo.private('App.Models.User.' + this.$page.props.user.id)
+     const vm=this;
+    Echo.private('App.Models.User.' + this.$page.props.user.id)
     .notification((notification) => {
       console.log(notification)
       if(notification.group){
@@ -206,6 +207,7 @@ export default {
       }
       //이거 온리 로 바꾸자 
         Inertia.reload({ only: ['notReadNotice'] })
+          vm.$inertia.reload(['notices'])
       //  this.$page.props.notReadNotice+=1
     });
   }

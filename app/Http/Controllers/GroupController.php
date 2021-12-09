@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\group_user;
+use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
 use App\Notifications\GroupNotice;
@@ -36,7 +37,7 @@ class GroupController extends Controller
 
     public function show($id)
     {
-        return Inertia::render('group/GroupShow', ['group' => Group::find($id)]);
+        return Inertia::render('group/GroupShow', ['group' => Group::find($id), 'reservations' => Group::find($id)->reservations]);
     }
 
     public function index()
@@ -175,6 +176,11 @@ class GroupController extends Controller
                     $user1->notify(new GroupNotice($datas));
                 }
             }
+
+            $Re = new Reservation();
+            $Re->group_id = $gorup->id;
+            $Re->Time = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s")));
+            $Re->save();
         }
 
         //방장이 시작한 이후 1번만 실행되야 됨 

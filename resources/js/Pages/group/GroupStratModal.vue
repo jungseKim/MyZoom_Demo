@@ -44,7 +44,8 @@ export default {
        methods:{
               Move(check){
                      if(check){
-                      Inertia.get('/group/video/'+this.group.id)
+                     // console.logth
+                      Inertia.get('/group/video/'+this.gruop.offerGroupId)
                      }
                      this.$emit('close');
               }

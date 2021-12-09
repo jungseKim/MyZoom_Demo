@@ -94,4 +94,6 @@ Route::prefix('notice/')->group(function () {
 
     Route::post('Reservation/{id}', [NoticeController::class, 'Reservation'])
         ->name('notice.Reservation');
+
+    Route::delete('cancle/{id}', [NoticeController::class, 'cancle']);
 });

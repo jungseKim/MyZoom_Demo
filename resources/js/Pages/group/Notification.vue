@@ -5,10 +5,10 @@
     <div class="text-center px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 bg-clip-padding bg-opacity-60 border border-gray-200" style="backdrop-filter: blur(20px);">
        <h1 class="text-2xl text-base  font-extrabold"> 알림 목록</h1>
   <ul class="flex flex-col divide-y w-full p-5">
-    <li class="flex flex-row" v-for="notice in notices" :key="notice.id" @click="showThisNotice(notice) ">
-      <group-notice v-if="notice.data.group" :notice="notice" />
-      <user-notice v-else :notice="notice"/>
-     <i @click="noticeRemove(notice.id)" class="fas fa-trash-alt fa-x self-center hover:bg-gray-50 "></i>
+    <li class="flex flex-row" v-for="notice in notices" :key="notice.id" >
+      <group-notice @click="this.showThisNotice(notice)" v-if="notice.data.group" :notice="notice" />
+      <user-notice @click="this.showThisNotice(notice)" v-else :notice="notice"/>
+     <i @click="noticeRemove(notice.id)" class="fas fa-trash-alt fa-2x self-center hover:bg-gray-50 "></i>
     </li>
   </ul>
 
@@ -99,12 +99,14 @@ export default {
         this.group=showNotice.data
         return
       }
-      axios.get('/group/info/'+showNotice.data.offerGroup).
+      else{
+        axios.get('/group/info/'+showNotice.data.offerGroup).
       then((res)=>{
         console.log(res.data)
          this.showNotice=res.data.group;
          this.userIn=res.data.userIn;
       })
+      }
 
     },
     confirm(check){
