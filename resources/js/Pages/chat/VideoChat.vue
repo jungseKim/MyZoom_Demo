@@ -6,7 +6,7 @@
 
     <div v-if="SharedScreen" class="h-3/5 flex flex-col">
          <div class="flex flex-row-reverse gap-4   mt-0 pb-0 ">
-              <div class="flex flex-col w-1/4 mb-0 pb-0 " v-for="user in users" :key="user.id">
+              <div class="flex flex-col w-1/4 mb-0 pb-0 border-2" v-for="user in users" :key="user.id">
               <video class="object-cover h-full  w-full"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-center " >
                 <div></div>
@@ -15,7 +15,7 @@
                 <i v-else class="fas fa-microphone"></i>
                 </div>
                </div>
-             <div class="flex flex-col w-1/4 mb-0 pb-0">
+             <div class="flex flex-col w-1/4 mb-0 pb-0 border-2">
                <video
                 class="object-cover h-full  w-full"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
@@ -33,8 +33,8 @@
          </div>
       </div>
 
-      <div v-else  :class="userCheck?'w-3/4 bg-blue-500 grid  grid-cols-2 gap-4 p-3':'w-3/4 bg-red-500'" ref="main">
-            <div class="flex flex-col" v-for="user in users" :key="user.id">
+      <div v-else  :class="userCheck?'w-3/4  grid  grid-cols-2 gap-4 p-3':'w-3/4 '" ref="main">
+            <div class="flex flex-col border-2" v-for="user in users" :key="user.id">
                   <video class="object-cover m-auto h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                 <div class="flex justify-between p-7 " >
                 <div></div>
@@ -44,7 +44,7 @@
                 </div>
                 <!-- <div v-if="user.audioActive">트루</div> -->
             </div>
-            <div  class="flex flex-col">
+            <div  class="flex flex-col border-2">
                 <!-- <p>my video</p> -->
                 <video
                 :class="userCheck?'m-auto  h-4/5 object-cover':'object-cover m-auto  h-2/5'"
@@ -304,7 +304,10 @@ export default {
 
         if(!permision){
               this.closeVideo()
-          }
+      const videoHere = this.$refs['video-here'];
+         videoHere.srcObject = this.streamPermision;
+          videoHere.muted=true;
+      }
           else{
              const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.streamPermision;
