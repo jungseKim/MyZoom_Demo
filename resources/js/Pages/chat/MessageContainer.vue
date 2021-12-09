@@ -1,6 +1,6 @@
 <template>
         <div>
-        <div class="h-96 bg-gray-200 overflow-y-scroll  scrollbar-hide" ref="messagess">
+        <div class="h-3/4 rounded-lg bg-gray-200 overflow-y-scroll  scrollbar-hide" ref="messagess">
             <div ref="container" class="container" v-for="message in messages" :key="message">
                 <div id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
                 <div class="chat-message" v-if="message.userId != $page.props.user.id">
@@ -36,8 +36,8 @@
              <!-- <input class="w-3/4" @keyup.enter="send" type="text" v-model="content"/>
 
                <div class="flex w-1/4 justify-center">
-              
-                   
+
+
                 </div>  -->
          </div>
                 <!-- <button  @click="send">send</button> -->
@@ -53,18 +53,18 @@ export default {
                      content:''
               }
        },
-       
+
        methods:{
               send(){
                      this.$emit('messageSend',this.content)
                      this.content=null
                     //  this.scrollToEnd()
               },
-              scrollToEnd: function() {    	
+              scrollToEnd: function() {
                 const messages = this.$refs.messagess;
                 messages.scrollTop = messages.scrollHeight;
                 },
        }
-       
+
 }
 </script>

@@ -1,10 +1,10 @@
 <template>
 <!-- <app-layout title="s"> -->
-    <div class="w-full h-screen flex flex-rows p-10 bg-gray-700" >
+    <div class="w-full h-screen flex flex-rows p-10 bg-gray-700 justify-between" >
 
-    <div v-if="SharedScreen" class="h-4/5 flex flex-col">
+    <div v-if="SharedScreen" class="h-4/5 flex flex-col gap-x-4">
          <div class="flex flex-row justify-center gap-4   mt-0 pb-0 ">
-              <div class="flex flex-col w-1/6 mb-0 pb-0 border-2" v-for="user in users" :key="user.id">
+              <div class="flex flex-col w-1/6 mb-0 pb-0 border-2 rounded-lg" v-for="user in users" :key="user.id">
               <video class="object-cover h-full  w-full"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-center " >
                 <div></div>
@@ -13,7 +13,7 @@
                 <i v-else class="fas fa-microphone"></i>
                 </div>
                </div>
-             <div class="flex flex-col w-1/6 mb-0 pb-0 border-2">
+             <div class="flex flex-col w-1/6 mb-0 pb-0 border-2 rounded-lg">
                <video
                 class="object-cover h-full  w-full"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
@@ -53,7 +53,7 @@
                 <div></div>
                 <h1 class=" font-bold text-2xl text-white" >my video</h1>
                 <i v-if="!activeOudio" class="fas fa-microphone-slash fa-2x"></i>
-                <i v-else class="fas fa-microphone fa-2x"></i>
+                <i v-else class="fas fa-microphone fa-2x color-white" ></i>
                 </div>
             </div>
        </div>
@@ -62,20 +62,26 @@
           <message-container class="h-full " ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend" />
        </div>
     </div >
-    <div class="fixed tod bottom-10 w-4/5 bg-gray-500 h-16 flex flex-row gap-x-2 items-center rounded-lg  justify-end mx-10">
-        <button
-        v-if="isManager"
-        @click="start"
-        class="sapce-x-20 p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
-         화면 공유</button>
-        <button
+    <div class="fixed tod bottom-10 w-4/5 bg-gray-500 h-16 flex flex-row gap-x-2 items-center rounded-lg  justify-between mx-10">
+        <div class="flex gap-x-2">
+            <button
         @click="closeVideo"
         class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          {{ activeVideo?'비디오 끄기':'비디오 켜기' }}</button>
           <button
           @click="closeAudio"
-          class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300 mr-2">
+          class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300 ">
          {{ activeVideo?'음소거':'오디오 키기' }}</button>
+        </div>
+        <div class="flex flex-row gap-x-2 items-center">
+            <button
+        v-if="isManager"
+        @click="start"
+        class="self-start p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+         화면 공유</button>
+            <i class="fas fa-sign-out-alt fa-2x mr-2"></i>
+            <!-- <i class="fas fa-door-open fa-2x mr-2"></i> -->
+        </div>
     </div>
 
 
@@ -120,7 +126,7 @@ export default {
 
   },
   mounted() {
-    
+    //   window.document.documentElement.requestFullscreen()
     this.setupVideoChat()
 
     window.addEventListener('beforeunload', this.RoomOut)

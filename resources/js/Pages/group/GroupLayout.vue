@@ -38,12 +38,12 @@
                 </div>
             </li>
             <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
-           
+
               <span>
                 <i class="far fa-envelope"></i>
               </span>
               <a :href="route('notice.index')" :active="route().current('notice.index')">
-               
+
                 <span class="ml-2">Notification</span>
               </a>
             </li>
@@ -58,7 +58,7 @@
                 </svg>
               </span>
               <a :href="route('group.create')" :active="route().current('group.create')">
-               
+
                 <span class="ml-2">Group Create</span>
               </a>
             </li>
@@ -72,24 +72,11 @@
                   ></path>
                 </svg>
               </span>
-              <a href="#">
-                <span class="ml-2">Team</span>
+              <a :href="route('profile.show')">
+                <span class="ml-2">MY</span>
               </a>
             </li>
-            <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
-              <span>
-                <svg class="fill-current h-5 w-5 " viewBox="0 0 24 24">
-                  <path
-                    d="M12 13H7v5h5v2H5V10h2v1h5v2M8
-                        4v2H4V4h4m2-2H2v6h8V2m10 9v2h-4v-2h4m2-2h-8v6h8V9m-2
-                        9v2h-4v-2h4m2-2h-8v6h8v-6z"
-                  ></path>
-                </svg>
-              </span>
-              <a href="#">
-                <span class="ml-2">Tasks</span>
-              </a>
-            </li>
+
             <li class="mb-2 px-4 py-4 text-gray-100 flex flex-row  border-gray-300 hover:text-black   hover:bg-gray-300  hover:font-bold rounded rounded-lg">
               <span>
                 <svg
@@ -136,7 +123,7 @@
                 </slot>
                 </div>
   <!-- </section> -->
-       
+
        <jet-dialog-modal :show="showNotice" @close="showNotice = false ">
         <template #content>
                <div class="w-full mx-3 overflow-hidden bg-white border rounded md:w-12/12 md:mx-0 lg:mx-0">
@@ -150,8 +137,8 @@
                       <!-- <span class="mr-1 font-black">{{showNotice.offerGroup.title}}</span> -->
                     </div>
                     <hr class="my-4">
-                    
-                
+
+
                     </div>
                 </div>
                        </template>
@@ -171,7 +158,7 @@
 </div>
 
 
-   
+
 </template>
 
 <script>
@@ -205,7 +192,7 @@ export default {
       else{
         this.showNotice=notification
       }
-      //이거 온리 로 바꾸자 
+      //이거 온리 로 바꾸자
         Inertia.reload({ only: ['notReadNotice'] })
           vm.$inertia.reload(['notices'])
       //  this.$page.props.notReadNotice+=1
@@ -220,7 +207,7 @@ export default {
       else{
          this.showNotice=false;
       }
-       
+
     }
   }
 }
