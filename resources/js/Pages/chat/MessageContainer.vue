@@ -1,6 +1,6 @@
 <template>
         <div>
-        <div class="h-96 overflow-y-scroll  scrollbar-hide" ref="messagess">
+        <div class="h-96 bg-gray-200 overflow-y-scroll  scrollbar-hide" ref="messagess">
             <div ref="container" class="container" v-for="message in messages" :key="message">
                 <div id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
                 <div class="chat-message" v-if="message.userId != $page.props.user.id">

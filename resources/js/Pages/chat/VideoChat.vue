@@ -1,16 +1,14 @@
 <template>
-<app-layout title="s">
-  <!-- <div class="container"> -->
-    <h1 class="text-center">Laravel Video Chat</h1>
-    <div class="w-full flex flex-rows p-10">
+<!-- <app-layout title="s"> -->
+    <div class="w-full h-screen flex flex-rows p-10 bg-gray-700" >
 
-    <div v-if="SharedScreen" class="h-3/5 flex flex-col">
-         <div class="flex flex-row-reverse gap-4   mt-0 pb-0 ">
+    <div v-if="SharedScreen" class="h-4/5 flex flex-col">
+         <div class="flex flex-row justify-center gap-4   mt-0 pb-0 ">
               <div class="flex flex-col w-1/6 mb-0 pb-0 border-2" v-for="user in users" :key="user.id">
               <video class="object-cover h-full  w-full"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-center " >
                 <div></div>
-                <h1 class=" font-bold text-lg" >{{user.name}}</h1>
+                <h1 class=" font-bold text-lg text-white" >{{user.name}}</h1>
                 <i v-if="!user.activeOudio" class="fas fa-microphone-slash "></i>
                 <i v-else class="fas fa-microphone"></i>
                 </div>
@@ -22,52 +20,53 @@
                 ref="video-here" autoplay></video>
                  <div class="flex  justify-center" >
                 <div></div>
-                <h1 class=" font-bold text-lg" >my video</h1>
+                <h1 class=" font-bold text-lg text-white" >my video</h1>
                 <i v-if="!activeOudio" class="fas fa-microphone-slash"></i>
                 <i v-else class="fas fa-microphone "></i>
                 </div>
              </div>
          </div>
-         <div class="p-5">
-             <video class="m-auto w-4/5  h-7/8 object-cover mb-20" ref="SharedScreen" autoplay muted></video>
+         <div class="flex flex-col  p-5 ">
+            <h1 class=" font-bold text-lg text-white text-center" >share Video</h1>
+             <video class="border-4 m-auto w-3/5  h-7/8 object-cover mb-20" ref="SharedScreen" autoplay muted></video>
          </div>
       </div>
 
-      <div v-else  :class="userCheck?'w-3/4  grid  grid-cols-2 gap-4 p-3':'w-3/4 '" ref="main">
-            <div class="flex flex-col border-2" v-for="user in users" :key="user.id">
+      <div v-else  :class="userCheck?'w-3/4 h-1/2  grid  grid-cols-2 gap-4 p-3':'w-3/4 h-1/2'" ref="main">
+            <div class="flex flex-col border-2 rounded-lg" v-for="user in users" :key="user.id">
                   <video class="object-cover m-auto h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                 <div class="flex justify-between p-7 " >
                 <div></div>
-                <h1 class=" font-bold text-2xlg" >{{user.name}}</h1>
+                <h1 class=" font-bold text-2xl text-white" >{{user.name}}</h1>
                 <i v-if="!user.activeOudio" class="fas fa-microphone-slash fa-2x"></i>
                 <i v-else class="fas fa-microphone fa-2x"></i>
                 </div>
                 <!-- <div v-if="user.audioActive">트루</div> -->
             </div>
-            <div  class="flex flex-col border-2">
+            <div  class="flex flex-col border-2 rounded-lg">
                 <!-- <p>my video</p> -->
                 <video
-                :class="userCheck?'m-auto  h-4/5 object-cover':'object-cover m-auto  h-2/5'"
+                :class="userCheck?'m-auto  h-4/5 object-cover ':'object-cover m-auto  h-2/5'"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
                  <div class="flex justify-between p-7 " >
                 <div></div>
-                <h1 class=" font-bold text-2xlg" >my video</h1>
+                <h1 class=" font-bold text-2xl text-white" >my video</h1>
                 <i v-if="!activeOudio" class="fas fa-microphone-slash fa-2x"></i>
                 <i v-else class="fas fa-microphone fa-2x"></i>
                 </div>
             </div>
        </div>
         <video-set :show="show" :stream="streamPermision" @close="close"/>
-       <div class="w-1/6 bg-gray-200">
+       <div class="w-1/6  ">
           <message-container class="h-full " ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend" />
        </div>
     </div >
-    <div class="fixed tod bottom-10 w-screen bg-gray-500 h-16 flex flex-row items-center">
+    <div class="fixed tod bottom-10 w-4/5 bg-gray-500 h-16 flex flex-row gap-x-2 items-center rounded-lg  justify-end mx-10">
         <button
         v-if="isManager"
         @click="start"
-        class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+        class="sapce-x-20 p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          화면 공유</button>
         <button
         @click="closeVideo"
@@ -75,13 +74,13 @@
          {{ activeVideo?'비디오 끄기':'비디오 켜기' }}</button>
           <button
           @click="closeAudio"
-          class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+          class="p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300 mr-2">
          {{ activeVideo?'음소거':'오디오 키기' }}</button>
     </div>
 
 
 
-</app-layout>
+<!-- </app-layout> -->
 </template>
 <script>
 import Peer from 'simple-peer';
@@ -121,6 +120,7 @@ export default {
 
   },
   mounted() {
+    
     this.setupVideoChat()
 
     window.addEventListener('beforeunload', this.RoomOut)
@@ -320,12 +320,16 @@ export default {
     },
     closeVideo(){
        const vm=this
-         this.stream.getTracks().forEach(function(track) {
+         try{
+           this.stream.getTracks().forEach(function(track) {
             if(track.kind=='video'){
                 track.enabled=!track.enabled
                 vm.activeVideo=track.enabled
                 }
             });
+        } catch(err){
+       alert('비디오 장치가 없습니다')
+     }
     },
     closeAudio(){
       const vm=this
@@ -343,7 +347,7 @@ export default {
             });
      }
      catch(err){
-       alert('오디오가 없음')
+       alert('오디오장치가 없습니다')
      }
 
 
