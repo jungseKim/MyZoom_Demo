@@ -221,7 +221,7 @@ export default {
         console.log(share.srcObject)
 
       }
-      if(this.activeVideo && this.stream){
+      if(this.stream){
         const videoHere = this.$refs['video-here'];
         videoHere.srcObject = this.stream;
          videoHere.muted=true;
