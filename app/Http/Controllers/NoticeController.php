@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\DB;
 
 class NoticeController extends Controller
 {
+    public function __construct()
+    {                                  //예외
+        $this->middleware(['auth']);
+    }
+
+
     public function index()
     {
         $id = auth()->user()->id;

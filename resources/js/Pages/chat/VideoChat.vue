@@ -79,7 +79,7 @@
         @click="start"
         class="self-start p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
          화면 공유</button>
-            <i class="fas fa-sign-out-alt fa-2x mr-2"></i>
+            <i class="fas fa-sign-out-alt fa-2x mr-2" @click="exit"></i>
             <!-- <i class="fas fa-door-open fa-2x mr-2"></i> -->
         </div>
     </div>
@@ -141,6 +141,9 @@ export default {
     }
   },
   methods: {
+    exit(){
+      Inertia.get('/group/index')
+    },
     messageSend(content){
         console.log(this.peers)
         this.channel.whisper('client-message-'+this.roomId, {

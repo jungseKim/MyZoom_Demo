@@ -44,6 +44,7 @@
            <button @click="dataClick" v-if="group.user_id==$page.props.user.id" class="py-3 px-6 text-white rounded-lg bg-gray-500 shadow-lg block md:inline-block">예약하기</button>
           <user-search-modal :searchUser="searchUser" @close="searchUser=false" @userAdd="userAdd()" />
         </div>
+        <div class="text-center"><p class="font-bold text-xl ">유저 초대</p></div>
          <div class="flex flex-rows" v-if="group.user_id==$page.props.user.id">
                 <input id="title" class="w-full" type="text" v-model="name" ref="inputs" @keyup.enter="search"><i @click="search()" class="fas fa-search fa-2x"></i>
            </div>
