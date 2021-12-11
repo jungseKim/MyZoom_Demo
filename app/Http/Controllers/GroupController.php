@@ -18,7 +18,7 @@ class GroupController extends Controller
 {
     public function __construct()
     {                                  //예외
-        $this->middleware(['auth']);
+        $this->middleware(['auth','verified' ]);
     }
 
     public function info($id)
