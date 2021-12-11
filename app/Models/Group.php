@@ -23,4 +23,8 @@ class Group extends Model
     {
         return $this->hasMany(Reservation::class)->latest('Time');
     }
+    public function key()
+    {
+        return $this->hasOne(Key::class);
+    }
 }

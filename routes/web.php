@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GestController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\SubjectController;
@@ -85,6 +86,19 @@ Route::prefix('group/')->group(function () {
 
     Route::get('path/{id}', [GroupController::class, 'path']);
 });
+
+Route::prefix('gest/')->group(
+    function () {
+        Route::post('video/{id}', [GestController::class, 'video']);
+
+        Route::get('start/{id}', [GestController::class, 'start'])
+            ->name('gest.start');
+        Route::get('out/{id}', [GestController::class, 'out']);
+    }
+);
+
+
+
 
 Route::prefix('notice/')->group(function () {
 

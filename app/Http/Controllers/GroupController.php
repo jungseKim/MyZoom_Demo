@@ -165,26 +165,40 @@ class GroupController extends Controller
 
         return redirect()->route('group.index');
     }
+    // public function gest(Request $request, $id)
+    // {
+    //     return Inertia::render('group/GestVarifiy');
+
+    //     if ($request->key && $request->key == Key::where('group_id', $id)->first()->value) {
+    //         $gest = new User();
+    //         $gest->name = 'Gest';
+    //         $gest->id = 12;
+    //         $gest->email = 'fjiejfiejife';
+    //         $gest->password = 123232;
+    //         // $gest->save();
+    //         // User::login();
+    //         Auth::login($gest);
+
+    //         return Inertia::render('chat/VideoChat')->with([
+    //             'user' => $gest,
+    //             'roomId' => $id,
+    //             'isManager' => false,
+
+    //         ]);
+    //     }
+    // }
 
     public function video(Request $request, $id)
     {
-        if ($request->key && $request->key == Key::where('group_id', $id)->first()->value) {
-            $gest = new User();
-            $gest->name = 'Gest';
-            $gest->id = 12;
-            $gest->email = 'fjiejfiejife';
-            $gest->password = 123232;
-            // $gest->save();
-            // User::login();
-            Auth::login($gest);
-            return Inertia::render('chat/VideoChat')->with([
-                // 'user' => collect($request->user()->only(['id', 'name'])),
-                // 'user' => $gest,
-                'roomId' => $id,
-                'isManager' => false,
-
-            ]);
+        // dd($request);
+        if ($request->thiskey && $request->thiskey == Group::find($request->id)->key->value) {
+            // dd($request);
+            return Inertia::render('group/GestVarifiy')->with(['thiskey' => $request->thiskey, 'id' => $id]);
         }
+
+        Auth::check();
+
+
 
         $user = auth()->user();
         $gorup = Group::find($id);
@@ -223,8 +237,8 @@ class GroupController extends Controller
     }
     public function path($id)
     {
-        $key = Key::where('group_id', $id)->first();
-
+        // $key = Key::where('group_id', $id)->first();
+        $key = Group::find($id)->key;
         return $key->value;
     }
 

@@ -74,6 +74,11 @@
          {{ activeVideo?'음소거':'오디오 키기' }}</button>
         </div>
         <div class="flex flex-row gap-x-2 items-center">
+          <button
+        v-if="isManager"
+        @click="copyPath"
+        class="self-start p-2 pl-5 pr-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300">
+         링크 복사</button>
             <button
         v-if="isManager"
         @click="start"
@@ -97,7 +102,7 @@ import Button from '../../Jetstream/Button.vue';
 import VideoSet from './VideoSet.vue'
 import { Inertia } from '@inertiajs/inertia'
 export default {
-  props: ['user','roomId','isManager'],
+  props: ['user','roomId','isManager','isGest'],
   data() {
     return {
       channel: null,
@@ -141,8 +146,26 @@ export default {
     }
   },
   methods: {
+    async copyPath() {
+          
+          let key=await axios.get('/group/path/'+this.roomId);
+          
+          const t = document.createElement("textarea");
+          document.body.appendChild(t);
+          t.value = window.document.location.href+'?thiskey='+key.data;
+          t.select();
+          document.execCommand('copy');
+          document.body.removeChild(t);
+          alert('복사 되었습니다.')
+      },
     exit(){
-      Inertia.get('/group/index')
+      if(this.isGest){
+        //  axios.delete('/gest/out/'+this.user.id)
+         Inertia.get('/gest/out/'+this.roomId)
+  }
+   else{
+        Inertia.get('/group/index')
+   }
     },
     messageSend(content){
         console.log(this.peers)
@@ -213,11 +236,12 @@ export default {
                 const p = this.peers[key]
                 p.destroy()
                 delete this.peers[key]
-                }
-     axios.delete('/chat/'+this.roomId+'/room')
-      .then(res=>{
-        console.log(res.data)
-      } )
+             }
+             if(this.isGest){
+        //  axios.delete('/gest/out/'+this.user.id)
+         Inertia.get('/gest/out/'+this.roomId)
+  }
+  
     },
     videoCom(check){
       if(this.SharedScreen ){
@@ -254,24 +278,24 @@ export default {
           initiator,//이거때문에 시그널 바로실행
           stream: stream,
           trickle: false,
-	config:{ iceServers: [
-        {
-        url: 'turn:numb.viagenie.ca',
-        credential: 'muazkh',
-        username: 'webrtc@live.com'
-},
-{
-        url: 'turn:numb.viagenie.ca:3478?transport=udp',
-        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        username: '28224511:1379330808'
-},
-{
-        url: 'turn:numb.viagenie.ca?transport=tcp',
-        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-        username: '28224511:1379330808'
-}
-]
-}
+// 	config:{ iceServers: [
+//         {
+//         url: 'turn:numb.viagenie.ca',
+//         credential: 'muazkh',
+//         username: 'webrtc@live.com'
+// },
+// {
+//         url: 'turn:numb.viagenie.ca:3478?transport=udp',
+//         credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+//         username: '28224511:1379330808'
+// },
+// {
+//         url: 'turn:numb.viagenie.ca?transport=tcp',
+//         credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+//         username: '28224511:1379330808'
+// }
+// ]
+// }
         });
         peer.on('signal', (data) => {
           this.channel.whisper(`client-signal-${userId}`, {
