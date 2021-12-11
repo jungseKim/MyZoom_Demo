@@ -99,8 +99,8 @@
                   />
                 </svg>
               </span>
-              <a href="#">
-                <span class="ml-2">Settings</span>
+              <a @click="logout">
+                <span class="ml-2">logout</span>
               </a>
             </li>
           </ul>
@@ -200,6 +200,9 @@ export default {
   }
   ,
   methods:{
+      logout() {
+                this.$inertia.post(route('logout'));
+            },
      confirm(check){
       if(check){
         Inertia.get('/group/notice')

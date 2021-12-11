@@ -82,6 +82,8 @@ Route::prefix('group/')->group(function () {
 
     Route::post('eazyAdd/{group_id}', [GroupController::class, 'eazyAdd'])
         ->name('group.eazyAdd');
+
+    Route::get('path/{id}', [GroupController::class, 'path']);
 });
 
 Route::prefix('notice/')->group(function () {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\group_user;
+use App\Models\Key;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
@@ -13,12 +14,14 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Pusher\Pusher;
 use App\Notifications\InvoicePaid;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class GroupController extends Controller
 {
     public function __construct()
     {                                  //예외
-        $this->middleware(['auth']);
+        $this->middleware(['auth', 'verified'])->except(['video']);
     }
 
     public function info($id)
@@ -83,6 +86,11 @@ class GroupController extends Controller
                 'group_id' => $gorup->id
             ]
         );
+
+        $k = new Key();
+        $k->value = Str::random(20);
+        $k->group_id = $gorup->id;
+        $k->save();
 
         if ($request->users) {
             $users = $request->users;
@@ -158,8 +166,26 @@ class GroupController extends Controller
         return redirect()->route('group.index');
     }
 
-    public function video($id)
+    public function video(Request $request, $id)
     {
+        if ($request->key && $request->key == Key::where('group_id', $id)->first()->value) {
+            $gest = new User();
+            $gest->name = 'Gest';
+            $gest->id = 12;
+            $gest->email = 'fjiejfiejife';
+            $gest->password = 123232;
+            // $gest->save();
+            // User::login();
+            Auth::login($gest);
+            return Inertia::render('chat/VideoChat')->with([
+                // 'user' => collect($request->user()->only(['id', 'name'])),
+                // 'user' => $gest,
+                'roomId' => $id,
+                'isManager' => false,
+
+            ]);
+        }
+
         $user = auth()->user();
         $gorup = Group::find($id);
 
@@ -182,7 +208,8 @@ class GroupController extends Controller
             $Re->Time = date("Y-m-d H:i:s", strtotime(date("Y-m-d H:i:s")));
             $Re->save();
         }
-
+        // $key = Key::where('group_id', $gorup->id)->first();
+        // dd($key->value);
         //방장이 시작한 이후 1번만 실행되야 됨 
 
 
@@ -190,10 +217,17 @@ class GroupController extends Controller
         return Inertia::render('chat/VideoChat')->with([
             // 'user' => collect($request->user()->only(['id', 'name'])),
             'roomId' => $id,
-            'isManager' => $user->id == $gorup->user_id ? true : false
+            'isManager' => $user->id == $gorup->user_id ? true : false,
 
         ]);
     }
+    public function path($id)
+    {
+        $key = Key::where('group_id', $id)->first();
+
+        return $key->value;
+    }
+
     public function Reservation(Request $request, $id)
     {
         $offer = auth()->user();
