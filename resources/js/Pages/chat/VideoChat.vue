@@ -32,9 +32,9 @@
          </div>
       </div>
 
-      <div v-else  :class="userCheck?'w-3/4 h-1/2  grid  grid-cols-2 gap-4 p-3':'w-3/4 h-1/2'" ref="main">
-            <div class="flex flex-col border-2 rounded-lg" v-for="user in users" :key="user.id">
-                  <video class="object-cover m-auto h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
+      <div v-else  :class="userCheck?'w-3/4 h-1/2  grid  grid-cols-2 gap-4 p-3':'w-3/4 h-1/4'" ref="main">
+            <div class="flex flex-col border-2 rounded-lg " v-for="user in users" :key="user.id">
+                  <video class="object-cover m-auto w-1/2  h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                 <div class="flex justify-between p-7 " >
                 <div></div>
                 <h1 class=" font-bold text-2xl text-white" >{{user.name}}</h1>
@@ -43,10 +43,10 @@
                 </div>
                 <!-- <div v-if="user.audioActive">트루</div> -->
             </div>
-            <div  class="flex flex-col border-2 rounded-lg">
+            <div  class="flex flex-col border-2 rounded-lg ">
                 <!-- <p>my video</p> -->
                 <video
-                :class="userCheck?'m-auto  h-4/5 object-cover ':'object-cover m-auto  h-2/5'"
+                :class="userCheck?'m-auto w-1/2  h-4/5 object-cover ':'object-cover m-auto  h-2/5'"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
                  <div class="flex justify-between p-7 " >
@@ -253,7 +253,25 @@ export default {
         let peer = new Peer({
           initiator,//이거때문에 시그널 바로실행
           stream: stream,
-          trickle: false
+          trickle: false,
+	config:{ iceServers: [
+        {
+        url: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com'
+},
+{
+        url: 'turn:numb.viagenie.ca:3478?transport=udp',
+        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+        username: '28224511:1379330808'
+},
+{
+        url: 'turn:numb.viagenie.ca?transport=tcp',
+        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+        username: '28224511:1379330808'
+}
+]
+}
         });
         peer.on('signal', (data) => {
           this.channel.whisper(`client-signal-${userId}`, {
