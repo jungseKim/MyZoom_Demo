@@ -196,7 +196,9 @@ class GroupController extends Controller
             return Inertia::render('group/GestVarifiy')->with(['thiskey' => $request->thiskey, 'id' => $id]);
         }
 
-        Auth::check();
+        if (!Auth::check()) {
+            return 403;
+        }
 
 
 

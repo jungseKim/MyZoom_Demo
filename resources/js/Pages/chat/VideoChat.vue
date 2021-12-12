@@ -4,7 +4,8 @@
 
     <div v-if="SharedScreen" class="h-4/5 flex flex-col gap-x-4">
          <div class="flex flex-row justify-center gap-4   mt-0 pb-0 ">
-              <div class="flex flex-col w-1/6 mb-0 pb-0 border-2 rounded-lg" v-for="user in users" :key="user.id">
+              <div :class="userCheck?'flex flex-col w-1/6 mb-0 pb-0 border-2 rounded-lg':'flex flex-col w-1/12 mb-0 pb-0 border-2 rounded-lg'"
+               v-for="user in users" :key="user.id">
               <video class="object-cover h-full  w-full"  :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                <div class="flex justify-center " >
                 <div></div>
@@ -13,7 +14,8 @@
                 <i v-else class="fas fa-microphone"></i>
                 </div>
                </div>
-             <div class="flex flex-col w-1/6 mb-0 pb-0 border-2 rounded-lg">
+             <div :class="userCheck?'flex flex-col w-1/6 mb-0 pb-0 border-2 rounded-lg':'flex flex-col w-1/12 mb-0 pb-0 border-2 rounded-lg'"
+             >
                <video
                 class="object-cover h-full  w-full"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
@@ -32,9 +34,9 @@
          </div>
       </div>
 
-      <div v-else  :class="userCheck?'w-3/4 h-1/2  grid  grid-cols-2 gap-4 p-3':'w-3/4 h-1/4'" ref="main">
+      <div v-else-if="userCheck"  class="w-3/4 h-1/2  grid  grid-cols-2 gap-4 p-3" ref="main">
             <div class="flex flex-col border-2 rounded-lg " v-for="user in users" :key="user.id">
-                  <video class="object-cover m-auto w-1/2  h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
+                  <video class="object-cover m-auto w-2/5  h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
                 <div class="flex justify-between p-7 " >
                 <div></div>
                 <h1 class=" font-bold text-2xl text-white" >{{user.name}}</h1>
@@ -46,7 +48,7 @@
             <div  class="flex flex-col border-2 rounded-lg ">
                 <!-- <p>my video</p> -->
                 <video
-                :class="userCheck?'m-auto w-1/2  h-4/5 object-cover ':'object-cover m-auto  h-2/5'"
+                :class="userCheck?'m-auto w-2/5  h-4/5 object-cover ':'object-cover m-auto  h-2/5'"
                 :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
                 ref="video-here" autoplay></video>
                  <div class="flex justify-between p-7 " >
@@ -57,6 +59,35 @@
                 </div>
             </div>
        </div>
+     
+      <div v-else  class="w-3/4 h-1/2  grid  grid-cols-3 gap-4 p-3" ref="main">
+          <div class="flex flex-col border-2 rounded-lg " v-for="user in users" :key="user.id">
+                <video class="object-cover m-auto w-2/5  h-4/5"   :ref="user.name" autoplay :poster="user.image?`/storage/${user.image}`:'/noimage.jpg'" :alt="user.name"></video>
+              <div class="flex justify-between p-7 " >
+              <div></div>
+              <h1 class=" font-bold text-2xl text-white" >{{user.name}}</h1>
+              <i v-if="!user.activeOudio" class="fas fa-microphone-slash fa-2x"></i>
+              <i v-else class="fas fa-microphone fa-2x"></i>
+              </div>
+              <!-- <div v-if="user.audioActive">트루</div> -->
+          </div>
+          <div  class="flex flex-col border-2 rounded-lg ">
+              <!-- <p>my video</p> -->
+              <video
+              class="m-auto w-2/5  h-4/5 object-cover"
+              :poster="$page.props.user.profile_photo_path?`/storage/${$page.props.user.profile_photo_path}`:'/noimage.jpg'"
+              ref="video-here" autoplay></video>
+                <div class="flex justify-between p-7 " >
+              <div></div>
+              <h1 class=" font-bold text-2xl text-white" >my video</h1>
+              <i v-if="!activeOudio" class="fas fa-microphone-slash fa-2x"></i>
+              <i v-else class="fas fa-microphone fa-2x color-white" ></i>
+              </div>
+          </div>
+      </div>
+       
+
+
         <video-set :show="show" :stream="streamPermision" @close="close"/>
        <div class="w-1/6  ">
           <message-container class="h-full " ref="messages" :users="users" :user="user" :messages="messages" @messageSend="messageSend" />
@@ -139,10 +170,14 @@ export default {
   ,
   computed:{
     userCheck(){
+      let i=0;
       for(let key in this.users){
-        return true
+        i+=1;
+        if(i>3){
+          return false
+        }
       }
-      return false
+      return true
     }
   },
   methods: {
@@ -278,24 +313,24 @@ export default {
           initiator,//이거때문에 시그널 바로실행
           stream: stream,
           trickle: false,
-// 	config:{ iceServers: [
-//         {
-//         url: 'turn:numb.viagenie.ca',
-//         credential: 'muazkh',
-//         username: 'webrtc@live.com'
-// },
-// {
-//         url: 'turn:numb.viagenie.ca:3478?transport=udp',
-//         credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-//         username: '28224511:1379330808'
-// },
-// {
-//         url: 'turn:numb.viagenie.ca?transport=tcp',
-//         credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-//         username: '28224511:1379330808'
-// }
-// ]
-// }
+	config:{ iceServers: [
+        {
+        url: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com'
+},
+{
+        url: 'turn:numb.viagenie.ca:3478?transport=udp',
+        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+        username: '28224511:1379330808'
+},
+{
+        url: 'turn:numb.viagenie.ca?transport=tcp',
+        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+        username: '28224511:1379330808'
+}
+]
+}
         });
         peer.on('signal', (data) => {
           this.channel.whisper(`client-signal-${userId}`, {
